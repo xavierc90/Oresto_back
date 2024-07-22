@@ -1,0 +1,17 @@
+{
+  "name": "oresto_back",
+  "version": "1.0.0",
+  "description": "Application Oresto (Back-end)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.5.1"
+  }
+}
