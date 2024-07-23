@@ -12,10 +12,13 @@ chai.use(chaiHttp)
 
 describe("POST - /register", () => {
     it("Ajouter un utilisateur. - S", (done) => {
-        chai.request(server).post('/user').send({
+        chai.request(server).post('/register').send({
             username: "John",
             email: "john1@gmail.com",
-            password: "123456"
+            password: "123456",
+            firstName: "Xavier",
+            lastName: "Colombel",
+            phone_number: 1234567890,
         }).end((err, res) => {
             expect(res).to.have.status(201)
             users.push(res.body)
