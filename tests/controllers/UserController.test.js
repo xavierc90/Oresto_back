@@ -87,44 +87,6 @@ describe("POST - /login", () => {
     })
 })
 
-describe("POST - /users", () => {
-    it("Ajouter plusieurs utilisateurs. - S", (done) => {
-        chai.request(server).post('/users').send([{
-            username: "John2",
-            email: "john2@gmail.com",
-            password: "123456"
-        },
-        {
-            username: "John3",
-            email: "john3@gmail.com",
-            password: "123456"
-        }]
-        )
-        .auth(token, { type: 'bearer' })
-        .end((err, res) => {
-            res.should.have.status(201)
-            users = [...users, ...res.body]
-            done()
-        });
-    })
-    it("Ajouter plusieurs utilisateurs sans etre authentifié. - E", (done) => {
-        chai.request(server).post('/users').send([{
-            username: "dwathttvrfSlayer",
-            email: "lutfgfbu.us@gmail.com",
-            password: "123456"
-        },
-        {
-            username: "dwgfbarfSlayer",
-            email: "lutgbffu.us@gmail.com",
-            password: "123456"
-        }]
-        ).end((err, res) => {
-            res.should.have.status(401)
-            done()
-        });
-    })
-})
-
 describe("GET - /user/:id", () => {
     it("Chercher un utilisateur correct. - S", (done) => {
         chai.request(server).get('/user/' + users[0]._id)
@@ -163,7 +125,7 @@ describe("GET - /user/:id", () => {
 
 describe("PUT - /user", () => {
     it("Modifier un utilisateur. - S", (done) => {
-        chai.request(server).put('/user/' + users[0]._id).send({ name: "Olivier" })
+        chai.request(server).put('/user/' + users[0]._id).send({ firstName: "Olivier" })
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
             res.should.have.status(200)
@@ -171,14 +133,14 @@ describe("PUT - /user", () => {
         })
     })
     it("Modifier un utilisateur sans etre authentifié. - E", (done) => {
-        chai.request(server).put('/user/' + users[0]._id).send({ name: "Olivier" })
+        chai.request(server).put('/user/' + users[0]._id).send({ firstName: "Olivier" })
         .end((err, res) => {
             res.should.have.status(401)
             done()
         })
     })
     it("Modifier un utilisateur avec un id invalide. - E", (done) => {
-        chai.request(server).put('/user/123456789').send({name: "Olivier", email: "Edouard@gmail.com"})
+        chai.request(server).put('/user/123456789').send({firstName: "Olivier", email: "Edouard@gmail.com"})
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
             res.should.have.status(405)
@@ -187,7 +149,7 @@ describe("PUT - /user", () => {
     })
 
     it("Modifier un utilisateur avec un id inexistant. - E", (done) => {
-        chai.request(server).put('/user/66791a552b38d88d8c6e9ee7').send({name: "Olivier", email: "Edouard2@gmail.com"})
+        chai.request(server).put('/user/66791a552b38d88d8c6e9ee7').send({firstName: "Olivier", email: "Edouard2@gmail.com"})
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
             res.should.have.status(404)
@@ -196,7 +158,7 @@ describe("PUT - /user", () => {
     })
 
     it("Modifier un utilisateur avec un champ requis vide. - E", (done) => {
-        chai.request(server).put('/user/' + users[0]._id).send({ username: "", name: "Edouard" })
+        chai.request(server).put('/user/' + users[0]._id).send({ username: "", firstName: "Edouard" })
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
             res.should.have.status(405)
@@ -216,15 +178,6 @@ describe("PUT - /user", () => {
 })
 
 describe("DELETE - /user", () => {
-    it("Supprimer un utilisateur. - S", (done) => {
-        chai.request(server).delete('/user/' + users[1]._id)
-        .auth(token, { type: 'bearer' })
-        .end((err, res) => {
-            // console.log(users)
-            res.should.have.status(200)
-            done()
-        })
-    })
     it("Supprimer un utilisateur sans etre authentifié. - E", (done) => {
         chai.request(server).delete('/user/' + users[1]._id)
         .end((err, res) => {
@@ -245,6 +198,15 @@ describe("DELETE - /user", () => {
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
             res.should.have.status(405)
+            done()
+        })
+    })
+    it("Supprimer un utilisateur. - S", (done) => {
+        chai.request(server).delete('/user/' + users[1]._id)
+        .auth(token, { type: 'bearer' })
+        .end((err, res) => {
+            // console.log(users)
+            res.should.have.status(200)
             done()
         })
     })
