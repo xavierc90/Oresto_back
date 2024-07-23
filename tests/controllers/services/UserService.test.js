@@ -5,6 +5,7 @@ const _ = require('lodash')
 var id_user_valid = ""
 var tab_id_users = []
 var users = []
+var token = ""
 
 describe("addOneUser", () => {
     it("Utilisateur correct. - S", () => {
@@ -12,7 +13,8 @@ describe("addOneUser", () => {
             username: "berpont1",
             name: "BernardDupont",
             email: "bernard.dupont1@gmail.com",
-            password: "123456"
+            password: "123456",
+            phone_number: 1234567890,
         }
         UserService.addOneUser(user, null, function (err, value) {
             expect(value).to.be.a('object');

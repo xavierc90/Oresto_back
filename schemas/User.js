@@ -2,6 +2,11 @@ const mongoose = require('mongoose')
 const ObjectId = mongoose.Types.ObjectId
 
 var UserSchema = mongoose.Schema({
+  company_id: {
+    type: ObjectId,
+    ref: 'Company',
+    required: false
+  },
   firstName: {
     type: String,
     required: true
@@ -20,7 +25,7 @@ var UserSchema = mongoose.Schema({
     type: String,
     index: true,
     unique: true,
-    required: true
+    required: false
   },
   password: {
     type: String,
@@ -32,7 +37,7 @@ var UserSchema = mongoose.Schema({
   },
   role: {
     type: String,
-    required: true,
+    required: false,
     enum: [
         "user",
         "manager",
@@ -42,7 +47,7 @@ var UserSchema = mongoose.Schema({
   },
   status: {
     type: String,
-    required: true,
+    required: false,
     enum: [
         "waiting",
         "active",

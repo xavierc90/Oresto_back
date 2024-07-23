@@ -38,10 +38,16 @@ app.use(bodyParser.json(), LoggerMiddleware.addLogger)
 app.post('/login', DatabaseMiddleware.checkConnection, UserController.loginUser)
 
 // Création du endpoint /user pour l'ajout d'un utilisateur
-app.post('/register', DatabaseMiddleware.checkConnection, UserController.addOneUser)
+app.post('/user', DatabaseMiddleware.checkConnection, UserController.addOneUser)
 
-// Création du endpoint /user pour la récupération d'un utilisateur via l'id
-app.get('/user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.findOneUserById)
+// Création du endpoint /user pour l'ajout de plusieurs utilisateurs
+app.post('/users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.addManyUsers) 
+
+// Création du endpoint /user pour la récupération d'un utilisateur par son id
+app.get('/user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findOneUserById) 
+
+// Création du endpoint /user pour la récupération d'un utilisateur
+app.get('/user', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findOneUser)
 
 // Création du endpoint /user pour la modification d'un utilisateur
 app.put('/user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.updateOneUser)
