@@ -10,7 +10,7 @@ let token
 
 chai.use(chaiHttp)
 
-describe("POST - /user", () => {
+describe("POST - /register", () => {
     it("Ajouter un utilisateur. - S", (done) => {
         chai.request(server).post('/user').send({
             username: "John",
@@ -23,7 +23,7 @@ describe("POST - /user", () => {
         });
     })
     it("Ajouter un utilisateur incorrect. (Sans username) - E", (done) => {
-        chai.request(server).post('/user').send({
+        chai.request(server).post('/register').send({
             email: 'lutfu.us@gmil.com',
             password: "123456"
         }).end((err, res) => {
@@ -32,7 +32,7 @@ describe("POST - /user", () => {
         })
     })
     it("Ajouter un utilisateur incorrect. (Avec un username existant) - E", (done) => {
-        chai.request(server).post('/user').send({
+        chai.request(server).post('/register').send({
             username: "John",
             email: "lutfu.us@gmai.com",
             password: "123456"
@@ -42,7 +42,7 @@ describe("POST - /user", () => {
         })
     })
     it("Ajouter un utilisateur incorrect. (Avec un champ vide) - E", (done) => {
-        chai.request(server).post('/user').send({
+        chai.request(server).post('/register').send({
             username: "dwarfSlaye",
             email: "",
             password: "123456"
