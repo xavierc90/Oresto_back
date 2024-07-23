@@ -38,25 +38,31 @@ app.use(bodyParser.json(), LoggerMiddleware.addLogger)
 app.post('/login', DatabaseMiddleware.checkConnection, UserController.loginUser)
 
 // Création du endpoint /user pour l'ajout d'un utilisateur
-app.post('/user', DatabaseMiddleware.checkConnection, UserController.addOneUser)
+app.post('/register', DatabaseMiddleware.checkConnection, UserController.addOneUser)
 
 // Création du endpoint /user pour l'ajout de plusieurs utilisateurs
-app.post('/users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.addManyUsers) 
+app.post('/add_users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.addManyUsers) 
 
 // Création du endpoint /user pour la récupération d'un utilisateur par son id
-app.get('/user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findOneUserById) 
+app.get('/find_user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findOneUserById) 
 
 // Création du endpoint /user pour la récupération d'un utilisateur
-app.get('/user', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findOneUser)
+app.get('/find_user', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findOneUser)
+
+// // Création du endpoint /users_by_filters pour la récupération de plusieurs utilisateurs
+// app.get('/users_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findManyUsers)
+
+// // Création du endpoint /user pour la récupération de plusieurs utilisateurs par id
+// app.get('/users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findManyUsersById) 
 
 // Création du endpoint /user pour la modification d'un utilisateur
-app.put('/user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.updateOneUser)
+app.put('/edit_user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.updateOneUser)
 
 // Création du endpoint /user pour la suppression d'un utilisateur
-app.delete('/user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.deleteOneUser)
+app.delete('/delete_user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.deleteOneUser)
 
 // Création du endpoint /user pour la suppression de plusieurs utilisateurs
-app.delete('/users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.deleteManyUsers)
+app.delete('/delete_users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.deleteManyUsers)
 
 app.listen(Config.port, () => {
   Logger.info(`Serveur démarré sur le port ${Config.port}`)
