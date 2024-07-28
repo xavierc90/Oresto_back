@@ -1,281 +1,170 @@
-const UserSchema = require('../schemas/User')
-const _ = require('lodash')
-const mongoose = require('mongoose')
-const ObjectId = mongoose.Types.ObjectId
-const bcrypt = require('bcryptjs')
-const TokenUtils = require('../utils/token')
-const SALT_WORK_FACTOR = 10
+const UserSchema = require('../schemas/User');
+const _ = require('lodash');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const TokenUtils = require('../utils/token');
+const SALT_WORK_FACTOR = 10;
 
-var User = mongoose.model('User', UserSchema)
+const User = mongoose.model('User', UserSchema);
 
-User.createIndexes()
+User.createIndexes();
 
-module.exports.loginUser = async function (username, password, options, callback) {
-    module.exports.findOneUser(['username', 'email'], username, null, async (err, value) => {
-      if (err)
-        callback(err)
-      else {
-        if (bcrypt.compareSync(password, value.password)) {
-          var token = TokenUtils.createToken({ _id: value._id }, null)
-          callback(null, { ...value, token: token })
-        }
-        else {
-          callback({ msg: "La comparaison des mots de passe sont fausses", type_error: "no_comparaison" })
-        }
-      }
-    })
+module.exports.loginUser = async function (email, password, options, callback) {
+  try {
+    const user = await User.findOne({ email }).exec();
+    if (!user) {
+      return callback({ msg: 'L\'adresse email ou le mot de passe n\'est pas correct', type_error: 'no-valid-login' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return callback({ msg: 'La comparaison des mots de passe est incorrecte', type_error: 'no_comparaison' });
+    }
+
+    const token = TokenUtils.createToken({ _id: user._id }, null);
+    callback(null, { ...user.toObject(), token: token });
+  } catch (err) {
+    callback(err);
   }
+};
 
 module.exports.addOneUser = async function (user, options, callback) {
-    try {
-        const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
-        if(user && user.password)
-            user.password = await bcrypt.hash(user.password, salt);
-        var new_user = new User(user);
-        var errors = new_user.validateSync();
-        if (errors) {
-            errors = errors['errors'];
-            var text = Object.keys(errors).map((e) => {
-                return errors[e]['properties']['message'];
-            }).join(' ');
-            var fields = _.transform(Object.keys(errors), function (result, value) {
-                result[value] = errors[value]['properties']['message'];
-            }, {});
-            var err = {
-                msg: text,
-                fields_with_error: Object.keys(errors),
-                fields: fields,
-                type_error: "validator"
-            };
-            callback(err);
-        } else {
-            await new_user.save();
-            callback(null, new_user.toObject());
-        }
-    } catch (error) {
-        if (error.code === 11000) { // Erreur de duplicité
-            var field = Object.keys(error.keyValue)[0];
-            var err = {
-                msg: `Duplicate key error: ${field} must be unique.`,
-                fields_with_error: [field],
-                fields: { [field]: `The ${field} is already taken.` },
-                type_error: "duplicate"
-            };
-            callback(err);
-        } else {
-            callback(error); // Autres erreurs
-        }
+  try {
+    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
+    if (user && user.password) user.password = await bcrypt.hash(user.password, salt);
+    const new_user = new User(user);
+    let errors = new_user.validateSync();
+    if (errors) {
+      errors = errors['errors'];
+      const text = Object.keys(errors)
+        .map((e) => {
+          return errors[e]['properties']['message'];
+        })
+        .join(' ');
+      const fields = _.transform(
+        Object.keys(errors),
+        function (result, value) {
+          result[value] = errors[value]['properties']['message'];
+        },
+        {}
+      );
+      const err = {
+        msg: text,
+        fields_with_error: Object.keys(errors),
+        fields: fields,
+        type_error: 'validator',
+      };
+      callback(err);
+    } else {
+      await new_user.save();
+      callback(null, new_user.toObject());
     }
+  } catch (error) {
+    if (error.code === 11000) {
+      // Erreur de duplicité
+      const field = Object.keys(error.keyValue)[0];
+      const err = {
+        msg: `Duplicate key error: ${field} must be unique.`,
+        fields_with_error: [field],
+        fields: { [field]: `The ${field} is already taken.` },
+        type_error: 'duplicate',
+      };
+      callback(err);
+    } else {
+      callback(error); // Autres erreurs
+    }
+  }
 };
 
-module.exports.addManyUsers = async function (users, options, callback) {
-    var errors = [];
+module.exports.findOneUserById = async function (user_id, options, callback) {
+  try {
+    if (!user_id || !mongoose.isValidObjectId(user_id)) {
+      return callback({ msg: 'ObjectId non conforme.', type_error: 'no-valid' });
+    }
 
-    // Vérifier les erreurs de validation
-    for (var i = 0; i < users.length; i++) {
-        var user = users[i];
-        const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
-        if(user && user.password)
-            user.password = await bcrypt.hash(user.password, salt);
-        
-        var new_user = new User(user);
-        var error = new_user.validateSync();
-        if (error) {
-            error = error['errors'];
-            var text = Object.keys(error).map((e) => {
-                return error[e]['properties']['message'];
-            }).join(' ');
-            var fields = _.transform(Object.keys(error), function (result, value) {
-                result[value] = error[value]['properties']['message'];
-            }, {});
-            errors.push({
-                msg: text,
-                fields_with_error: Object.keys(error),
-                fields: fields,
-                index: i,
-                type_error: "validator"
-            });
-        }
+    const user = await User.findById(user_id).exec();
+    if (!user) {
+      return callback({ msg: 'Aucun utilisateur trouvé.', type_error: 'no-found' });
     }
-    if (errors.length > 0) {
-        callback(errors);
-    } else {
-        try {
-            // Tenter d'insérer les utilisateurs
-            const data = await User.insertMany(users, { ordered: false });
-            callback(null, data);
-        } catch (error) {
-            if (error.code === 11000) { // Erreur de duplicité
-                const duplicateErrors = error.writeErrors.map(err => {
-                    //const field = Object.keys(err.keyValue)[0];
-                    const field = err.err.errmsg.split(" dup key: { ")[1].split(':')[0].trim();
-                    return {
-                        msg: `Duplicate key error: ${field} must be unique.`,
-                        fields_with_error: [field],
-                        fields: { [field]: `The ${field} is already taken.` },
-                        index: err.index,
-                        type_error: "duplicate"
-                    };
-                });
-                callback(duplicateErrors);
-            } else {
-                callback(error); // Autres erreurs
-            }
-        }
-    }
+
+    callback(null, user.toObject());
+  } catch (err) {
+    callback({ msg: 'Impossible de chercher l\'élément.', type_error: 'error-mongo' });
+  }
 };
-
-module.exports.findOneUserById = function (user_id, options, callback) {
-    
-    if (user_id && mongoose.isValidObjectId(user_id)) {
-        User.findById(user_id).then((value) => {
-            try {
-                if (value) {
-                    callback(null, value.toObject());
-                } else {
-                    callback({ msg: "Aucun utilisateur trouvé.", type_error: "no-found" });
-                }
-            }
-            catch (e) {
-                console.log(e)
-            }
-        }).catch((err) => {
-            callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
-        });
-    } else {
-        callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' });
-    }
-}
-
-module.exports.findOneUser = function (tab_field, value, options, callback) {
-    var field_unique = ['username', 'email']
-    
-    if (tab_field && Array.isArray(tab_field) && value && _.filter(tab_field, (e) => { return field_unique.indexOf(e) == -1}).length == 0) {
-        var obj_find = []
-        _.forEach(tab_field, (e) => {
-            obj_find.push({[e]: value})
-        })
-        User.findOne({ $or: obj_find}).then((value) => {
-            if (value)
-                callback(null, value.toObject())
-            else {
-                callback({msg: "Utilisateur non trouvé.", type_error: "no-found"})
-            }
-        }).catch((err) => {
-            callback({msg: "Error interne mongo", type_error:'error-mongo'})
-        })
-    }
-    else {
-        let msg = ''
-        if(!tab_field || !Array.isArray(tab_field)) {
-            msg += "Les champs de recherche sont incorrecte."
-        }
-        if(!value){
-            msg += msg ? " Et la valeur de recherche est vide" : "La valeur de recherche est vide"
-        }
-        if(_.filter(tab_field, (e) => { return field_unique.indexOf(e) == -1}).length > 0) {
-            var field_not_authorized = _.filter(tab_field, (e) => { return field_unique.indexOf(e) == -1})
-            msg += msg ? ` Et (${field_not_authorized.join(',')}) ne sont pas des champs de recherche autorisé.` : 
-            `Les champs (${field_not_authorized.join(',')}) ne sont pas des champs de recherche autorisé.`
-            callback({ msg: msg, type_error: 'no-valid', field_not_authorized: field_not_authorized })
-        }
-        else{
-            callback({ msg: msg, type_error: 'no-valid'})
-        }
-    }
-}
 
 module.exports.updateOneUser = async function (user_id, update, options, callback) {
-    update.updated_at = new Date()
+  update.updated_at = new Date();
 
-    if (user_id && mongoose.isValidObjectId(user_id)) {
-        const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
-        if(update && update.password)
-            update.password = await bcrypt.hash(update.password, salt);
-        User.findByIdAndUpdate(new ObjectId(user_id), update, { returnDocument: 'after', runValidators: true }).then((value) => {
-            try {
-                // callback(null, value.toObject())
-                if (value)
-                    callback(null, value.toObject())
-                else
-                    callback({ msg: "Utilisateur non trouvé.", type_error: "no-found" });
+  try {
+    if (!user_id || !mongoose.isValidObjectId(user_id)) {
+      return callback({ msg: 'Id invalide.', type_error: 'no-valid' });
+    }
 
-            } catch (e) {
-                
-                callback(e)
-            }
-        }).catch((errors) => {
-            if(errors.code === 11000){
-                var field = Object.keys(errors.keyPattern)[0]
-                const duplicateErrors = {
-                    msg: `Duplicate key error: ${field} must be unique.`,
-                    fields_with_error: [field],
-                    fields: { [field]: `The ${field} is already taken.` },
-                    type_error: "duplicate"
-                };
-                callback(duplicateErrors)
-            }else {
-                errors = errors['errors']
-                var text = Object.keys(errors).map((e) => {
-                    return errors[e]['properties']['message']
-                }).join(' ')
-                var fields = _.transform(Object.keys(errors), function (result, value) {
-                    result[value] = errors[value]['properties']['message'];
-                }, {});
-                var err = {
-                    msg: text,
-                    fields_with_error: Object.keys(errors),
-                    fields: fields,
-                    type_error: "validator"
-                }
-                callback(err)
-            }
-        })
+    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
+    if (update && update.password) update.password = await bcrypt.hash(update.password, salt);
+    
+    const user = await User.findByIdAndUpdate(new ObjectId(user_id), update, { returnDocument: 'after', runValidators: true }).exec();
+    if (!user) {
+      return callback({ msg: 'Utilisateur non trouvé.', type_error: 'no-found' });
     }
-    else {
-        callback({ msg: "Id invalide.", type_error: 'no-valid' })
-    }
-}
 
-module.exports.deleteOneUser = function (user_id, options, callback) {
-    if (user_id && mongoose.isValidObjectId(user_id)) {
-        User.findByIdAndDelete(user_id).then((value) => {
-            try {
-                if (value)
-                    callback(null, value.toObject())
-                else
-                    callback({ msg: "Utilisateur non trouvé.", type_error: "no-found" });
-            }
-            catch (e) {
-                
-                callback(e)
-            }
-        }).catch((e) => {
-            callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
-        })
+    callback(null, user.toObject());
+  } catch (errors) {
+    if (errors.code === 11000) {
+      const field = Object.keys(errors.keyPattern)[0];
+      const duplicateErrors = {
+        msg: `Duplicate key error: ${field} must be unique.`,
+        fields_with_error: [field],
+        fields: { [field]: `The ${field} is already taken.` },
+        type_error: 'duplicate'
+      };
+      callback(duplicateErrors);
+    } else {
+      const text = Object.keys(errors).map((e) => {
+        return errors[e]['properties']['message'];
+      }).join(' ');
+      const fields = _.transform(Object.keys(errors), function (result, value) {
+        result[value] = errors[value]['properties']['message'];
+      }, {});
+      const err = {
+        msg: text,
+        fields_with_error: Object.keys(errors),
+        fields: fields,
+        type_error: 'validator'
+      };
+      callback(err);
     }
-    else {
-        callback({ msg: "Id invalide.", type_error: 'no-valid' })
-    }
-}
+  }
+};
 
-module.exports.deleteManyUsers = function (users_id, options, callback) {
-    if (users_id && Array.isArray(users_id) && users_id.length > 0 && users_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == users_id.length) {
-        users_id = users_id.map((e) => { return new ObjectId(e) })
-        User.deleteMany({ _id: users_id }).then((value) => {
-            callback(null, value)
-        }).catch((err) => {
-            callback({ msg: "Erreur mongo suppression.", type_error: "error-mongo" });
-        })
+module.exports.deleteOneUser = async function (user_id, options, callback) {
+  try {
+    if (!user_id || !mongoose.isValidObjectId(user_id)) {
+      return callback({ msg: 'Id invalide.', type_error: 'no-valid' });
     }
-    else if (users_id && Array.isArray(users_id) && users_id.length > 0 && users_id.filter((e) => { return mongoose.isValidObjectId(e) }).length != users_id.length) {
-        callback({ msg: "Tableau non conforme plusieurs éléments ne sont pas des ObjectId.", type_error: 'no-valid', fields: users_id.filter((e) => { return !mongoose.isValidObjectId(e) }) });
-    }
-    else if (users_id && !Array.isArray(users_id)) {
-        callback({ msg: "L'argement n'est pas un tableau.", type_error: 'no-valid' });
 
+    const user = await User.findByIdAndDelete(user_id).exec();
+    if (!user) {
+      return callback({ msg: 'Utilisateur non trouvé.', type_error: 'no-found' });
     }
-    else {
-        callback({ msg: "Tableau non conforme.", type_error: 'no-valid' });
+
+    callback(null, user.toObject());
+  } catch (err) {
+    callback({ msg: 'Impossible de chercher l\'élément.', type_error: 'error-mongo' });
+  }
+};
+
+module.exports.deleteManyUsers = async function (users_id, options, callback) {
+  try {
+    if (!Array.isArray(users_id) || users_id.length === 0 || users_id.filter((e) => !mongoose.isValidObjectId(e)).length > 0) {
+      return callback({ msg: 'Tableau non conforme.', type_error: 'no-valid' });
     }
-}
+
+    const userIds = users_id.map((e) => new ObjectId(e));
+    const result = await User.deleteMany({ _id: userIds }).exec();
+    callback(null, result);
+  } catch (err) {
+    callback({ msg: 'Erreur mongo suppression.', type_error: 'error-mongo' });
+  }
+};

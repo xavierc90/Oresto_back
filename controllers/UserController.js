@@ -2,23 +2,26 @@ const UserService = require("../services/UserService");
 const LoggerHttp = require("../utils/logger").http;
 const passport = require("passport");
 
-// la fonction pour gerer l'authentification depuispassport
+// la fonction pour gérer l'authentification depuis UserService
 module.exports.loginUser = function(req, res, next) {
-  passport.authenticate('login', { badRequestMessage: "Les champs sont manquants."}, async function(err, user) {
-      if(err) {
-          res.statusCode = 401
-          return res.send({msg: "Le nom d'utilisateur ou le mot de passe n'est pas correct", type_error: "no-valid-login"})
-      }
-      req.logIn(user, async function (err) {
-          if(err) {
-              res.statusCode = 500
-              return res.send({msg: "Probleme d'authentification sur le serveur.", type_error: "internal"})
-          }else{
-              return res.send(user)
-          }
-      })
-  })(req, res, next)
-}
+  const { email, password } = req.body;
+
+  console.log("Requête de connexion reçue :", { email, password });
+
+  UserService.loginUser(email, password, null, (err, user) => {
+    if (err) {
+      console.log("Erreur de connexion :", err);
+      res.statusCode = 401;
+      return res.send({ msg: err.msg, type_error: err.type_error });
+    }
+
+    console.log("Utilisateur connecté :", user);
+
+    // Ajouter le token à la réponse utilisateur
+    res.statusCode = 200;
+    return res.send(user);
+  });
+};
 
 // La fonction permet d'ajouter un utilisateur
 module.exports.addOneUser = function (req, res) {
@@ -75,7 +78,7 @@ module.exports.findOneUserById = function (req, res) {
   });
 };
 
-// La fonction permet de chercher un utilisateur par les champs autorisé
+// La fonction permet de chercher un utilisateur par les champs autorisés
 module.exports.findOneUser = function (req, res) {
   LoggerHttp(req, res);
   req.log.info("Recherche d'un utilisateur par un champ autorisé");
@@ -98,7 +101,6 @@ module.exports.findOneUser = function (req, res) {
   });
 };
 
-
 // La fonction permet de modifier un utilisateur
 module.exports.updateOneUser = function (req, res) {
   LoggerHttp(req, res);
@@ -108,7 +110,6 @@ module.exports.updateOneUser = function (req, res) {
     req.body,
     null,
     function (err, value) {
-      //
       if (err && err.type_error == "no-found") {
         res.statusCode = 404;
         res.send(err);
