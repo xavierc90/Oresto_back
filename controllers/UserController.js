@@ -151,6 +151,7 @@ module.exports.findManyUsersById = function(req, res) {
 };
 
 // La fonction permet de modifier un utilisateur
+
 module.exports.updateOneUser = function (req, res) {
   LoggerHttp(req, res);
   req.log.info("Modification d'un utilisateur");
@@ -159,6 +160,7 @@ module.exports.updateOneUser = function (req, res) {
     req.body,
     null,
     function (err, value) {
+  //    console.log(err, value);
       if (err && err.type_error == "no-found") {
         res.statusCode = 404;
         res.send(err);
