@@ -57,11 +57,11 @@ app.get('/find_user/:id', DatabaseMiddleware.checkConnection, passport.authentic
 // Création du endpoint /user pour la récupération d'un utilisateur
 app.get('/find_user', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findOneUser)
 
-// // Création du endpoint /users_by_filters pour la récupération de plusieurs utilisateurs
-// app.get('/users_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findManyUsers)
+// Création du endpoint /users_by_filters pour la récupération de plusieurs utilisateurs
+app.get('/users_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findManyUsers)
 
-// // Création du endpoint /user pour la récupération de plusieurs utilisateurs par id
-// app.get('/users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findManyUsersById) 
+// Création du endpoint /user pour la récupération de plusieurs utilisateurs par id
+app.get('/find_users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findManyUsersById) 
 
 // Création du endpoint /user pour la modification d'un utilisateur
 app.put('/edit_user/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.updateOneUser)

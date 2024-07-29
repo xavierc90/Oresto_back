@@ -6,16 +6,16 @@ const passport = require("passport");
 module.exports.loginUser = function(req, res, next) {
   const { email, password } = req.body;
 
-  console.log("Requête de connexion reçue :", { email, password });
+  // console.log("Requête de connexion reçue :", { email, password });
 
   UserService.loginUser(email, password, null, (err, user) => {
     if (err) {
-      console.log("Erreur de connexion :", err);
+      // console.log("Erreur de connexion :", err);
       res.statusCode = 401;
       return res.send({ msg: err.msg, type_error: err.type_error });
     }
 
-    console.log("Utilisateur connecté :", user);
+    // console.log("Utilisateur connecté :", user);
 
     // Ajouter le token à la réponse utilisateur
     res.statusCode = 200;
@@ -97,6 +97,55 @@ module.exports.findOneUser = function (req, res) {
     } else {
       res.statusCode = 200;
       res.send(value);
+    }
+  });
+};
+
+// La fonction permet de chercher plusieurs utilisateurs
+module.exports.findManyUsers = function(req, res) {
+  req.log.info("Chercher plusieurs utilisateurs")
+  let page = req.query.page
+  let pageSize = req.query.pageSize
+  let search = req.query.q
+  UserService.findManyUsers(search, page, pageSize, function(err, value) {
+    if (err && err.type_error == "no-valid") {
+      res.statusCode = 405
+      res.send(err)
+    }
+    else if (err && err.type_error == "error-mongo") {
+      res.statusCode = 500
+      res.send(err)
+    }
+    else {
+      res.statusCode = 200
+      res.send(value)
+    }
+  })
+}
+
+// La fonction permet de trouver plusieurs utilisateurs.
+module.exports.findManyUsersById = function(req, res) {
+  req.log.info("Chercher plusieurs utilisateurs")
+  let userId = req.query.id;
+  if (userId && !Array.isArray(userId))
+    userId = [userId]
+
+  UserService.findManyUsersById(userId,null, function(err, value) {
+    if (err && err.type_error === "no-found") {
+      res.statusCode = 404
+      res.send(err)
+    } 
+    else if (err && err.type_error == "no-valid") {
+      res.statusCode = 405
+      res.send(err)
+    }
+    else if (err && err.type_error == "error-mongo") {
+      res.statusCode = 500
+      res.send(err)
+    }
+    else {
+      res.statusCode = 200
+      res.send(value)
     }
   });
 };

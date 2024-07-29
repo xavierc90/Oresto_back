@@ -25,7 +25,7 @@ var UserSchema = mongoose.Schema({
     type: String,
     index: true,
     unique: true,
-    required: false
+    required: true
   },
   password: {
     type: String,
@@ -44,19 +44,6 @@ var UserSchema = mongoose.Schema({
         "admin"
     ],
     default: "user"
-  },
-  status: {
-    type: String,
-    required: false,
-    enum: [
-        "waiting",
-        "active",
-    ],
-    default: "waiting"
-  },
-  token_valid: {
-    type: String,
-    required: false
   },
   token_reset: {
     type: String,
