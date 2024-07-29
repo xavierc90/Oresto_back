@@ -1,16 +1,8 @@
 const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId;
 
 var CompanySchema = mongoose.Schema({
-  openhour_id: {
-    type: ObjectId,
-    ref: 'OpenHour',
-    required: true
-  },
   name: {
     type: String,
-    index: true,
-    unique: true,
     required: true
   },
   address: {
@@ -35,11 +27,11 @@ var CompanySchema = mongoose.Schema({
   },
   email: {
     type: String,
-    required: true
+    required: false
   },
   status: {
     type: String,
-    required: false,
+    required: true,
     enum: [
       "opened",
       "closed"
@@ -56,4 +48,5 @@ var CompanySchema = mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Company', CompanySchema);
+// module.exports = mongoose.model('Company', CompanySchema);
+module.exports = CompanySchema
