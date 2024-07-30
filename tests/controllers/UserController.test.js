@@ -63,7 +63,7 @@ describe("POST - /register", () => {
 
 describe("POST - /login", () => {
     it("Connexion utilisateur - S", (done) => {
-        console.log(users)
+        // console.log(users)
         chai.request(server).post('/login').send({
             email: "testeur@gmail.com",
             password: "azerty"
@@ -94,29 +94,6 @@ describe("POST - /login", () => {
 })
 
 describe("POST - /add_users", () => {
-    it("Ajout de plusieurs utilisateurs. - E (Unauthorized)", (done) => {
-        chai.request(server).post('/add_users')
-        .send([{
-          firstname: "Edouard",
-          lastname: "BERNIER",
-          username: "edbernie",
-          email: "edouard.bernierrr@155.fr",
-          phone_number: "1234567890",
-          password: "azerty"
-        },
-        {
-          firstname: "Edouard",
-          lastname: "BERNIER",
-          username: "edbernie123",
-          email: "edouard.bernier5455@155.fr",
-          phone_number: "1234567890",
-          password: "azerty"
-        }])
-        .end((err, res) => {
-          res.should.have.status(401)
-          done()
-        })
-      })
       it("Ajout de plusieurs utilisateurs. - S", (done) => {
         chai.request(server).post('/add_users')
         .send([{
@@ -139,6 +116,29 @@ describe("POST - /add_users", () => {
         .end((err, res) => {
           res.should.have.status(201)
           users = [...users, ...res.body]
+          done()
+        })
+      })
+      it("Ajout de plusieurs utilisateurs. - E (Unauthorized)", (done) => {
+        chai.request(server).post('/add_users')
+        .send([{
+          firstname: "Edouard",
+          lastname: "BERNIER",
+          username: "edbernie",
+          email: "edouard.bernierrr@155.fr",
+          phone_number: "1234567890",
+          password: "azerty"
+        },
+        {
+          firstname: "Edouard",
+          lastname: "BERNIER",
+          username: "edbernie123",
+          email: "edouard.bernier5455@155.fr",
+          phone_number: "1234567890",
+          password: "azerty"
+        }])
+        .end((err, res) => {
+          res.should.have.status(401)
           done()
         })
       })
@@ -214,18 +214,18 @@ describe("POST - /add_users", () => {
 })
 
 describe("GET - /find_user", () => {
-    it("Rechercher un utilisateur avec un champ valide. - E (Unauthorized)", (done) => {
-        chai.request(server).get('/find_user').query({fields: ['username'], value: users[0].username})
-        .end((err, res) => {
-            res.should.have.status(401)
-            done()
-        })
-    })
     it("Rechercher un utilisateur avec un champ valide. - S", (done) => {
         chai.request(server).get('/find_user').query({fields: ['email'], value: users[0].email})
         .auth(token, { type: 'bearer' })
         .end((err, res) => {
             res.should.have.status(200)
+            done()
+        })
+    })
+    it("Rechercher un utilisateur avec un champ valide. - E (Unauthorized)", (done) => {
+        chai.request(server).get('/find_user').query({fields: ['username'], value: users[0].username})
+        .end((err, res) => {
+            res.should.have.status(401)
             done()
         })
     })
@@ -265,18 +265,18 @@ describe("GET - /find_user", () => {
 })
 
 describe("GET - /find_user/:id", () => {
-    it("Rechercher un utilisateur avec son id. - E (Unauthorized)", (done) => {
-        chai.request(server).get('/find_user/' + users[0]._id)
-        .end((err, res) => {
-            res.should.have.status(401)
-            done()
-        })
-    })
     it("Rechercher un utilisateur avec son id. - S", (done) => {
         chai.request(server).get('/find_user/' + users[0]._id)
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
             res.should.have.status(200)
+            done()
+        })
+    })
+    it("Rechercher un utilisateur avec son id. - E (Unauthorized)", (done) => {
+        chai.request(server).get('/find_user/' + users[0]._id)
+        .end((err, res) => {
+            res.should.have.status(401)
             done()
         })
     })
@@ -299,18 +299,18 @@ describe("GET - /find_user/:id", () => {
 })
 
 describe("GET - /find_users", () => {
-    it("Rechercher plusieurs utilisateurs par ID. - E (Unauthorized)", (done) => {
-        chai.request(server).get('/find_users').query({id: _.map(users, '_id')})
-        .end((err, res) => {
-            res.should.have.status(401)
-            done()
-        })
-    })
     it("Rechercher plusieurs utilisateurs par ID. - S", (done) => {
         chai.request(server).get('/find_users').query({id: _.map(users, '_id')})
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
             res.should.have.status(200)
+            done()
+        })
+    })
+    it("Rechercher plusieurs utilisateurs par ID. - E (Unauthorized)", (done) => {
+        chai.request(server).get('/find_users').query({id: _.map(users, '_id')})
+        .end((err, res) => {
+            res.should.have.status(401)
             done()
         })
     })
@@ -333,20 +333,20 @@ describe("GET - /find_users", () => {
   })
 
 describe("PUT - /edit_user", () => {
-    it("Modifier un utilisateur. - E (Unauthorized)", (done) => {
-        chai.request(server).put('/edit_user/' + users[0]._id)
-        .send({firstname: 'loutfou'})
-        .end((err, res) => {
-            res.should.have.status(401)
-            done()
-        })
-    })
     it("Modifier un utilisateur. - S", (done) => {
         chai.request(server).put('/edit_user/' + users[0]._id)
         .auth(token, { type: 'bearer' }) 
         .send({firstname: 'loutfou'})
         .end((err, res) => {
             res.should.have.status(200)
+            done()
+        })
+    })
+    it("Modifier un utilisateur. - E (Unauthorized)", (done) => {
+        chai.request(server).put('/edit_user/' + users[0]._id)
+        .send({firstname: 'loutfou'})
+        .end((err, res) => {
+            res.should.have.status(401)
             done()
         })
     })
@@ -391,18 +391,18 @@ describe("PUT - /edit_user", () => {
 
 
 describe("DELETE - /delete_user", () => {
-    it("Supprimer un utilisateur. - E (Unauthorized)", (done) => {
-        chai.request(server).delete('/delete_user/' + users[1]._id)
-        .end((err, res) => {
-            res.should.have.status(401)
-            done()
-        })
-    })
     it("Supprimer un utilisateur. - S", (done) => {
         chai.request(server).delete('/delete_user/' + users[1]._id)
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
             res.should.have.status(200)
+            done()
+        })
+    })
+    it("Supprimer un utilisateur. - E (Unauthorized)", (done) => {
+        chai.request(server).delete('/delete_user/' + users[1]._id)
+        .end((err, res) => {
+            res.should.have.status(401)
             done()
         })
     })

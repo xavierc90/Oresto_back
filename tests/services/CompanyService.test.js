@@ -72,7 +72,7 @@ describe("addOneCompany", () => {
             done()        
         })
     })
-    it("Restaurant incorrect (Sans name) - E", (done) => {
+    it("Restaurant incorrect (Sans name). - E", (done) => {
         var company_no_valid = {
             address: "18 rue Hubert Metzger",
             postal_code: "90000",
@@ -92,7 +92,7 @@ describe("addOneCompany", () => {
             done()      
         })
     })
-    it("Restaurant incorrect (Sans user_id) - E", (done) => {
+    it("Restaurant incorrect (Sans user_id). - E", (done) => {
         var company_no_valid = {
             name: "La belle assiette",
             address: "18 rue Hubert Metzger",
