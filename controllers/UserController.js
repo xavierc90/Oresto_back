@@ -149,6 +149,9 @@ module.exports.loginUser = function(req, res, next) {
  *     description: Find one user with the Id_ provided.
  *     tags: 
  *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters: 
  *     requestBody:
  *       required: true
  *       content:
