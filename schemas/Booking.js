@@ -10,16 +10,17 @@ var BookingSchema = mongoose.Schema({
     table_id: {
         type: ObjectId,
         ref: 'Table',
-        required
+        required: true
     },
     company_id: {
         type: ObjectId,
         ref: 'Company',
+        required: false,
     },
     date: {
         type: Date,
-        required: true,
-        default: Date.now
+        default: Date.now,
+        required: true
     },
     nbr_persons: {
         type: Number,
@@ -27,7 +28,7 @@ var BookingSchema = mongoose.Schema({
     },
     table_number: {
         type: Number,
-        required: true
+        required: false
     },
     status: {
         type: String,
