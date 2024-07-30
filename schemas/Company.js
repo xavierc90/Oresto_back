@@ -13,7 +13,36 @@ var CompanySchema = mongoose.Schema({
   },
   address: {
     type: String,
-    required: true
+    required: false
+  },
+  postal_code: {
+    type: Number,
+    required: false    
+  },
+  city: {
+    type: String,
+    required: false
+  },
+  country: {
+    type: String,
+    required: false
+  },
+  phone_number: {
+    type: Number,
+    required: false
+  },
+  email: {
+    type: String,
+    required: false
+  },
+  status: {
+    type: String,
+    required: false,
+    enum: [
+      "opened",
+      "closed"
+    ],
+    default: "opened"
   },
   created_at: {
     type: Date,

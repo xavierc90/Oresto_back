@@ -87,6 +87,8 @@ app.delete('/delete_users', DatabaseMiddleware.checkConnection, passport.authent
 // Création du endpoint /company pour l'ajout d'un restaurant
 app.post('/company', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany)
 
+// Création du endpoint /companies pour l'ajout d'un restaurant
+// app.post('/companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany)
 
 app.listen(Config.port, () => {
   Logger.info(`Serveur démarré sur le port ${Config.port}`)

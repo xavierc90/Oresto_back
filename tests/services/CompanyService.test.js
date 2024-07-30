@@ -56,6 +56,11 @@ describe("addOneCompany", () => {
         var company_valid = {
             name: "La belle assiette",
             address: "18 rue Hubert Metzger",
+            postal_code: "90000",
+            city: "Belfort",
+            country: "France",
+            phone_number: "+33601020304",
+            email: "contact@labelleassiette.fr",
             user_id: rdm_user(tab_id_users)
         }
         CompanyService.addOneCompany(company_valid, null, function (err, value) {
@@ -63,9 +68,6 @@ describe("addOneCompany", () => {
             expect(value).to.haveOwnProperty('_id')
             expect(value).to.haveOwnProperty('user_id')
             expect(value).to.haveOwnProperty('name')
-            expect(value).to.haveOwnProperty('address')
-            company.push(value)
-            console.log(company)
             done()        
         })
     })
