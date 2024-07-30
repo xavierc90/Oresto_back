@@ -2,6 +2,36 @@ const UserService = require("../services/UserService");
 const LoggerHttp = require("../utils/logger").http;
 const passport = require("passport");
 
+
+/**
+* @swagger
+* /login:
+*    post:
+*      summary: Login user
+*      description: Login user with the provided details.
+*      tags:
+*        - Login
+*      requestBody:
+*        required: true
+*        content:
+*          application/json:
+*            schema:
+*              $ref: '#/components/schemas/Login'
+*      responses:
+*        200:
+*          description: Login successfully.
+*          content:
+*            application/json:
+*              schema:
+*                $ref: '#/components/schemas/User'
+*        404:
+*          $ref: '#/components/responses/NotFound'
+*        405:
+*          $ref: '#/components/responses/ValidationError'
+*        500:
+*          description: Internal server error.
+*/
+
 // la fonction pour gérer l'authentification depuis UserService
 module.exports.loginUser = function(req, res, next) {
   const { email, password } = req.body;

@@ -7,11 +7,11 @@ var UserSchema = mongoose.Schema({
     ref: 'Company',
     required: false
   },
-  firstName: {
+  firstname: {
     type: String,
     required: true
   },
-  lastName: {
+  lastname: {
     type: String,
     required: true
   },

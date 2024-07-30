@@ -10,8 +10,8 @@ describe("addOneUser", () => {
     it("Utilisateur correct. - S", (done) => {
         var user = {
             username: "berpont1",
-            firstName: "BernardDupont",
-            lastName: "test",
+            firstname: "BernardDupont",
+            lastname: "test",
             email: "bernard.dupont1@gmail.com",
             password: "123456",
             phone_number: 1234567890,
@@ -28,8 +28,8 @@ describe("addOneUser", () => {
     })
     it("Utilisateur incorrect. (Sans username) - E", (done) => {
         var user_no_valid = {
-            firstName: "BernardDupont",
-            lastName: "test",
+            firstname: "BernardDupont",
+            lastname: "test",
             email: "bernard.dup@gmail.com",
             phone_number: 1234567890,
             password: "123456"
@@ -45,8 +45,8 @@ describe("addOneUser", () => {
     })
     it("Utilisateur incorrect. (Avec un username déjà utilisé) - E", (done) => {
         let user_no_valid = {
-            lastName: "test",
-            firstName: "BernardDupont",
+            lastname: "test",
+            firstname: "BernardDupont",
             username: "berpont1",
             email: "bernard.dupont1110963@gmail.com",
             password: "123456",
@@ -89,23 +89,23 @@ describe("addManyUsers", () => {
     })
     it("Utilisateurs à ajouter, valide. - S", (done) => {
         var users_tab = [{
-            firstName: "Julien",
-            lastName: "Dupont",
+            firstname: "Julien",
+            lastname: "Dupont",
             username: "Zensuni",
             email: "alex.porteron1@gmail.com",
             phone_number: 1234567890,
             password: "topsecret"
         }, {
-            firstName: "Julien",
-            lastName: "Dupont",
+            firstname: "Julien",
+            lastname: "Dupont",
             username: "Tissou",
             email: "mat.boi1@gmail.com",
             phone_number: 1234567890,
             password: "chouchou"
         },
         {
-            firstName: "Julien",
-            lastName: "Dupont",
+            firstname: "Julien",
+            lastname: "Dupont",
             username: "Zazoul",
             email: "lut.us1@gmail.com",
             phone_number: 1234567890,
@@ -130,7 +130,7 @@ describe("findOneUser", () => {
         })
     })
     it("Chercher un utilisateur avec un champ non autorisé. - E", (done) => {
-        UserService.findOneUser(["email", "firstName"], users[0].username, null, function (err, value) {
+        UserService.findOneUser(["email", "firstname"], users[0].username, null, function (err, value) {
             expect(err).to.haveOwnProperty('type_error')
             done()
         })
@@ -203,11 +203,11 @@ describe("findManyUsersById", () => {
 
 describe("updateOneUser", () => {
     it("Modifier un utilisateur correct. - S", (done) => {
-        UserService.updateOneUser(id_user_valid, { username: "dragon3000", firstName: "cracheurdefeu" }, null, function (err, value) {
+        UserService.updateOneUser(id_user_valid, { username: "dragon3000", firstname: "cracheurdefeu" }, null, function (err, value) {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
             expect(value).to.haveOwnProperty('username')
-            expect(value).to.haveOwnProperty('firstName')
+            expect(value).to.haveOwnProperty('firstname')
             expect(value['username']).to.be.equal('dragon3000')
             done()
 
@@ -223,7 +223,7 @@ describe("updateOneUser", () => {
         })
     })
     it("Modifier un utilisateur avec des champs requis vide. - E", (done) => {
-        UserService.updateOneUser(id_user_valid, { username: "", firstName: "AlexandrePorteron", phone_number: "0102030405" }, null, function (err, value) {
+        UserService.updateOneUser(id_user_valid, { username: "", firstname: "AlexandrePorteron", phone_number: "0102030405" }, null, function (err, value) {
             expect(value).to.be.undefined
             expect(err).to.haveOwnProperty('msg')
             expect(err).to.haveOwnProperty('fields_with_error').with.lengthOf(1)

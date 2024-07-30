@@ -168,7 +168,7 @@ module.exports.findManyUsers = function (search, page, limit, options, callback)
     if (typeof page !== 'number' || typeof limit !== 'number' || isNaN(page) || isNaN(limit)) {
         callback({msg: `format de ${typeof page !== 'number' ? 'page' : 'limit'} invalide.`, type_error: 'no-valid'});
     } else {
-        let query_mongo = search ? {$or: _.map(["firstName", "lastName", "username", "phone_number", "email"], (e) =>
+        let query_mongo = search ? {$or: _.map(["firstname", "lastname", "username", "phone_number", "email"], (e) =>
         { return {[e]: {$regex: search}} })} : {}
         User.countDocuments().then((value) => {
             if (value > 0) {
