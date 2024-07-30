@@ -133,7 +133,7 @@ module.exports.loginUser = function(req, res, next) {
       return res.send({ msg: err.msg, type_error: err.type_error });
     }
 
-    console.log("Utilisateur connecté :", user);
+    // console.log("Utilisateur connecté :", user);
 
     // Ajouter le token à la réponse utilisateur
     res.statusCode = 200;
