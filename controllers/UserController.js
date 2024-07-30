@@ -6,7 +6,7 @@ const passport = require("passport");
  * @swagger
  * /register:
  *   post:
- *     summary: Create a new user
+ *     summary: Create a new user (Register)
  *     description: Create a new user with the provided details.
  *     tags: 
  *       - User
@@ -53,7 +53,6 @@ module.exports.addOneUser = function (req, res) {
     }
   });
 };
-
 
 /**
  * @swagger
@@ -142,8 +141,34 @@ module.exports.loginUser = function(req, res, next) {
   });
 };
 
-
-
+/**
+ * @swagger
+ * /find_user/{id}:
+ *   get:
+ *     summary: Find one user by Id
+ *     description: Find one user with the Id_ provided.
+ *     tags: 
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User finded successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       405:
+ *          $ref: '#/components/responses/ValidationError'
+ *       500:
+ *         $ref: '#/components/responses/MongoError'
+ */
 // La fonction permet de chercher un utilisateur
 module.exports.findOneUserById = function (req, res) {
   req.log.info("Recherche d'un utilisateur par son id");

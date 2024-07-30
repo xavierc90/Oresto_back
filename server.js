@@ -80,6 +80,13 @@ app.delete('/delete_user/:id', DatabaseMiddleware.checkConnection, passport.auth
 // Création du endpoint /user pour la suppression de plusieurs utilisateurs
 app.delete('/delete_users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.deleteManyUsers)
 
+
+/*--------------------- Création des routes (Company - Entreprises) ---------------------*/
+
+// Création du endpoint /company pour l'ajout d'un restaurant
+app.post('/companies', DatabaseMiddleware.checkConnection, CompanyController.addOneCompany)
+
+
 app.listen(Config.port, () => {
   Logger.info(`Serveur démarré sur le port ${Config.port}`)
 })

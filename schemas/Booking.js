@@ -12,14 +12,14 @@ var BookingSchema = mongoose.Schema({
         ref: 'Table',
         required: true
     },
-    date: {
+    date_selected: {
         type: Date,
         default: Date.now,
         required: true
     },
     nbr_persons: {
         type: Number,
-        required: true
+        required: true,
     },
     status: {
         type: String,
@@ -38,5 +38,4 @@ var BookingSchema = mongoose.Schema({
     }
 })
 
-// module.exports = mongoose.model('Booking', BookingSchema);
-module.exports = BookingSchema
+module.exports = mongoose.model('Booking', BookingSchema);

@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 var CompanySchema = mongoose.Schema({
   user_id: {
     type: ObjectId,
     ref: 'User',
-    required: false
+    required: true
   },
   name: {
     type: String,
@@ -12,36 +13,7 @@ var CompanySchema = mongoose.Schema({
   },
   address: {
     type: String,
-    required: false
-  },
-  postal_code: {
-    type: Number,
-    required: false    
-  },
-  city: {
-    type: String,
-    required: false
-  },
-  country: {
-    type: String,
-    required: false
-  },
-  phone_number: {
-    type: Number,
-    required: false
-  },
-  email: {
-    type: String,
-    required: false
-  },
-  status: {
-    type: String,
-    required: true,
-    enum: [
-      "opened",
-      "closed"
-    ],
-    default: "opened"
+    required: true
   },
   created_at: {
     type: Date,
@@ -53,5 +25,4 @@ var CompanySchema = mongoose.Schema({
   }
 });
 
-// module.exports = mongoose.model('Company', CompanySchema);
 module.exports = CompanySchema

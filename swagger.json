@@ -25,12 +25,12 @@
                     "properties": {
                         "firstname": {
                             "type": "string",
-                            "description": "The user's first name",
+                            "description": "The user's firstname",
                             "example": "John"
                         },
                         "lastname": {
                             "type": "string",
-                            "description": "The user's last name",
+                            "description": "The user's lastname",
                             "example": "Doe"
                         },
                         "email": {
@@ -58,6 +58,22 @@
                 "Login": {
                     "type": "object",
                     "required": ["email", "password"],
+                    "properties": {
+                        "email": {
+                            "type": "string",
+                            "description": "The user's email",
+                            "example": "johndoe@example.com"
+                        },
+                        "password": {
+                            "type": "string",
+                            "description": "The user's password",
+                            "example": "secret"
+                        }
+                    }
+                },
+                "Register": {
+                    "type": "object",
+                    "required": ["firstname", "lastname", "email", "phone_number", "password"],
                     "properties": {
                         "email": {
                             "type": "string",
