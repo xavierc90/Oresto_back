@@ -2,20 +2,15 @@ const mongoose = require('mongoose')
 const ObjectId = mongoose.Types.ObjectId
 
 var BookingSchema = mongoose.Schema({
-    user_id: {
+    company_id: {
         type: ObjectId,
-        ref: 'User',
+        ref: 'Company',
         required: true
     },
     table_id: {
         type: ObjectId,
         ref: 'Table',
         required: true
-    },
-    company_id: {
-        type: ObjectId,
-        ref: 'Company',
-        required: false,
     },
     date: {
         type: Date,
@@ -26,13 +21,9 @@ var BookingSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    table_number: {
-        type: Number,
-        required: false
-    },
     status: {
         type: String,
-        required: false,
+        required: true,
         enum: [
             "waiting",
             "confirmed",

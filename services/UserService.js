@@ -12,22 +12,6 @@ var User = mongoose.model('User', UserSchema)
 
 User.createIndexes()
 
-module.exports.loginUser = async function (email, password, options, callback) {
-    module.exports.findOneUser(["email"] ,email, null, async (err, value) => {
-        if(err)
-            callback(err)
-        else {
-            if (bcrypt.compareSync(password, value.password)) {
-                var token = TokenUtils.createToken({ _id: value._id }, null)
-                callback(null, {...value, token: token})
-            }
-            else {
-                callback({msg: "La comparaison des mots de passe est fausse.", type_error: "no-comparaison"})
-            }
-        }
-    })
-}
-
 module.exports.addOneUser = async function (user, options, callback) {
     try {
         const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
@@ -125,6 +109,22 @@ module.exports.addManyUsers = async function (users, options, callback) {
       }
   }
 };
+
+module.exports.loginUser = async function (email, password, options, callback) {
+    module.exports.findOneUser(["email"] ,email, null, async (err, value) => {
+        if(err)
+            callback(err)
+        else {
+            if (bcrypt.compareSync(password, value.password)) {
+                var token = TokenUtils.createToken({ _id: value._id }, null)
+                callback(null, {...value, token: token})
+            }
+            else {
+                callback({msg: "La comparaison des mots de passe est fausse.", type_error: "no-comparaison"})
+            }
+        }
+    })
+}
 
 module.exports.findOneUser = function (tab_field, value, options, callback) {
     var field_unique = ["username", "email"];

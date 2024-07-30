@@ -2,57 +2,6 @@ const UserService = require("../services/UserService");
 const LoggerHttp = require("../utils/logger").http;
 const passport = require("passport");
 
-
-/**
-* @swagger
-* /login:
-*    post:
-*      summary: Login user
-*      description: Login user with the provided details.
-*      tags:
-*        - Login
-*      requestBody:
-*        required: true
-*        content:
-*          application/json:
-*            schema:
-*              $ref: '#/components/schemas/Login'
-*      responses:
-*        200:
-*          description: Login successfully.
-*          content:
-*            application/json:
-*              schema:
-*                $ref: '#/components/schemas/User'
-*        404:
-*          $ref: '#/components/responses/NotFound'
-*        405:
-*          $ref: '#/components/responses/ValidationError'
-*        500:
-*          description: Internal server error.
-*/
-// la fonction pour gérer l'authentification depuis UserService
-module.exports.loginUser = function(req, res, next) {
-  const {email, password } = req.body;
-
-  // console.log("Requête de connexion reçue :", { email, password });
-
-  UserService.loginUser(email, password, null, (err, user) => {
-    if (err) {
-      // console.log("Erreur de connexion :", err);
-      res.statusCode = 401;
-      return res.send({ msg: err.msg, type_error: err.type_error });
-    }
-
-    console.log("Utilisateur connecté :", user);
-
-    // Ajouter le token à la réponse utilisateur
-    res.statusCode = 200;
-    return res.send(user);
-  });
-};
-
-
 /**
  * @swagger
  * /register:
@@ -79,7 +28,7 @@ module.exports.loginUser = function(req, res, next) {
  *       405:
  *          $ref: '#/components/responses/ValidationError'
  *       500:
- *         description: Internal server error.
+ *         $ref: '#/components/responses/MongoError'
  */
 // La fonction permet d'ajouter un utilisateur
 module.exports.addOneUser = function (req, res) {
@@ -95,6 +44,9 @@ module.exports.addOneUser = function (req, res) {
     } else if (err && err.type_error == "duplicate") {
       res.statusCode = 405;
       res.send(err);
+    } else if (err && err.type_error == "error-mongo") {
+      res.statusCode = 500;
+      res.send(err);
     } else {
       res.statusCode = 201;
       res.send(value);
@@ -102,6 +54,31 @@ module.exports.addOneUser = function (req, res) {
   });
 };
 
+
+/**
+ * @swagger
+ * /add_users:
+ *   post:
+ *     summary: Create many users
+ *     description: Create many users with the provided details.
+ *     tags: 
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: Users are created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       405:
+ *          $ref: '#/components/responses/ValidationError'
+ */
 // La fonction permet d'ajouter plusieurs utilisateurs
 module.exports.addManyUsers = function (req, res) {
   req.log.info("Création de plusieurs utilisateurs");
@@ -115,6 +92,57 @@ module.exports.addManyUsers = function (req, res) {
     }
   });
 };
+
+/**
+* @swagger
+* /login:
+*    post:
+*      summary: Login user
+*      description: Login user with the provided details.
+*      tags:
+*        - User
+*      requestBody:
+*        required: true
+*        content:
+*          application/json:
+*            schema:
+*              $ref: '#/components/schemas/Login'
+*      responses:
+*        200:
+*          description: Login successfully.
+*          content:
+*            application/json:
+*              schema:
+*                $ref: '#/components/schemas/User'
+*        404:
+*          $ref: '#/components/responses/NotFound'
+*        405:
+*          $ref: '#/components/responses/ValidationError'
+*        500:
+*          $ref: '#/components/responses/InternalError'
+*/
+// la fonction pour gérer l'authentification depuis UserService
+module.exports.loginUser = function(req, res, next) {
+  const {email, password } = req.body;
+
+  // console.log("Requête de connexion reçue :", { email, password });
+
+  UserService.loginUser(email, password, null, (err, user) => {
+    if (err) {
+      // console.log("Erreur de connexion :", err);
+      res.statusCode = 401;
+      return res.send({ msg: err.msg, type_error: err.type_error });
+    }
+
+    console.log("Utilisateur connecté :", user);
+
+    // Ajouter le token à la réponse utilisateur
+    res.statusCode = 200;
+    return res.send(user);
+  });
+};
+
+
 
 // La fonction permet de chercher un utilisateur
 module.exports.findOneUserById = function (req, res) {

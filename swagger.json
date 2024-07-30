@@ -61,13 +61,13 @@
                     "properties": {
                         "email": {
                             "type": "string",
-                            "description": "The user's username",
-                            "example": "testeur@test.fr"
+                            "description": "The user's email",
+                            "example": "johndoe@example.com"
                         },
                         "password": {
                             "type": "string",
                             "description": "The user's password",
-                            "example": "secretpassword"
+                            "example": "secret"
                         }
                     }
                 }
@@ -132,7 +132,28 @@
                             }
                         }
                     }
+                },
+                "MongoError": {
+                    "description": "Internal server error",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "type_error": {
+                                        "type": "string",
+                                        "example": "error-mongo"
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Internal server error"
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+                
             }
         },
         "tags": [{
@@ -140,12 +161,8 @@
                 "description": "Operations about user"
             },
             {
-                "name": "Login",
-                "description": "Operations about authentification"
-            },
-            {
-                "name": "Register",
-                "description": "Operations about register"
+                "name": "Bookings",
+                "description": "Operations about bookings"
             }
         ]
     },

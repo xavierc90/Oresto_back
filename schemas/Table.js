@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const TableSchema = mongoose.Schema({
+  company_id: {
+    type: ObjectId,
+    ref: 'Company',
+    required: true
+},
   table_number: {
     type: Number,
     required: true,
