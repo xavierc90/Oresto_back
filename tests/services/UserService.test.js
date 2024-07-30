@@ -9,46 +9,43 @@ var users = []
 describe("addOneUser", () => {
     it("Utilisateur correct. - S", (done) => {
         var user = {
-            username: "berpont1",
             firstname: "BernardDupont",
             lastname: "test",
             email: "bernard.dupont1@gmail.com",
             password: "123456",
-            phone_number: 1234567890,
+            phone_number: "1234567890"
         }
         UserService.addOneUser(user, null, function (err, value) {
             expect(value).to.be.a('object');
             expect(value).to.haveOwnProperty('_id');
-            expect(value).to.haveOwnProperty('username');
             expect(value).to.haveOwnProperty('email');
             id_user_valid = String(value._id)
             users.push(value)
             done()
         })
     })
-    it("Utilisateur incorrect. (Sans username) - E", (done) => {
+    it("Utilisateur incorrect. (Sans email) - E", (done) => {
         var user_no_valid = {
             firstname: "BernardDupont",
             lastname: "test",
-            email: "bernard.dup@gmail.com",
-            phone_number: 1234567890,
+            phone_number: "1234567890",
             password: "123456"
         }
         UserService.addOneUser(user_no_valid, null, function (err, value) {
             expect(err).to.haveOwnProperty('msg')
             expect(err).to.haveOwnProperty('fields_with_error').with.lengthOf(1)
             expect(err).to.haveOwnProperty('fields')
-            expect(err['fields']).to.haveOwnProperty('username')
-            expect(err['fields']['username']).to.equal('Path `username` is required.')
+            expect(err['fields']).to.haveOwnProperty('email')
+            expect(err['fields']['email']).to.equal('Path `email` is required.')
             done()
         })
     })
-    it("Utilisateur incorrect. (Avec un username déjà utilisé) - E", (done) => {
+    it("Utilisateur incorrect. (Avec un email déjà utilisé) - E", (done) => {
         let user_no_valid = {
             lastname: "test",
             firstname: "BernardDupont",
-            username: "berpont1",
-            email: "bernard.dupont1110963@gmail.com",
+            email: "berpont1",
+            email: "bernard.dupont1@gmail.com",
             password: "123456",
             phone_number: 123456789
         }
@@ -56,8 +53,8 @@ describe("addOneUser", () => {
             expect(err).to.haveOwnProperty('msg')
             expect(err).to.haveOwnProperty('fields_with_error').with.lengthOf(1)
             expect(err).to.haveOwnProperty('fields')
-            expect(err['fields']).to.haveOwnProperty('username')
-           // expect(err['fields']['username']).to.equal('Path `username` must be unique.')
+            expect(err['fields']).to.haveOwnProperty('email')
+           // expect(err['fields']['email']).to.equal('Path `email` must be unique.')
             done()
         })
     })
@@ -66,20 +63,20 @@ describe("addOneUser", () => {
 describe("addManyUsers", () => {
     it("Utilisateurs à ajouter, non valide. - E", (done) => {
         var users_tab_error = [{
-            username: "berpont3",
+            email: "berpont3",
             email: "bernard.dupont3@gmail.com",
             password: "123456"
         }, {
-            username: "",
+            email: "",
             email: "bernard.dupont4@gmail.com",
             password: "123456"
         },
         {
-            username: "berpont4",
+            email: "berpont4",
             email: "bernard.dupon5t@gmail.com",
             password: "123456"
         }, {
-            username: "berpont5",
+            email: "berpont5",
             email: "bernard.dupont6@gmail.com"
         }]
 
@@ -91,14 +88,12 @@ describe("addManyUsers", () => {
         var users_tab = [{
             firstname: "Julien",
             lastname: "Dupont",
-            username: "Zensuni",
             email: "alex.porteron1@gmail.com",
             phone_number: 1234567890,
             password: "topsecret"
         }, {
             firstname: "Julien",
             lastname: "Dupont",
-            username: "Tissou",
             email: "mat.boi1@gmail.com",
             phone_number: 1234567890,
             password: "chouchou"
@@ -106,7 +101,6 @@ describe("addManyUsers", () => {
         {
             firstname: "Julien",
             lastname: "Dupont",
-            username: "Zazoul",
             email: "lut.us1@gmail.com",
             phone_number: 1234567890,
             password: "enfant"
@@ -123,26 +117,26 @@ describe("addManyUsers", () => {
 
 describe("findOneUser", () => {
     it("Chercher un utilisateur par les champs selectionnées. - S", (done) => {
-        UserService.findOneUser(["email", "username"], users[0].username, null, function (err, value) {
-            expect(value).to.haveOwnProperty('username')
+        UserService.findOneUser(["email"], users[0].email, null, function (err, value) {
+            expect(value).to.haveOwnProperty('email')
             done()
 
         })
     })
     it("Chercher un utilisateur avec un champ non autorisé. - E", (done) => {
-        UserService.findOneUser(["email", "firstname"], users[0].username, null, function (err, value) {
+        UserService.findOneUser(["email", "firstname"], users[0].email, null, function (err, value) {
             expect(err).to.haveOwnProperty('type_error')
             done()
         })
     })
     it("Chercher un utilisateur sans tableau de champ. - E", (done) => {
-        UserService.findOneUser("email", users[0].username, null, function (err, value) {
+        UserService.findOneUser("email", users[0].email, null, function (err, value) {
             expect(err).to.haveOwnProperty('type_error')
             done()
         })
     })
     it("Chercher un utilisateur inexistant. - E", (done) => {
-        UserService.findOneUser(["email"], "users[0].username", null, function (err, value) {
+        UserService.findOneUser(["email"], "users[0].email", null, function (err, value) {
             expect(err).to.haveOwnProperty('type_error')
             done()
         })
@@ -154,7 +148,7 @@ describe("findOneUserById", () => {
         UserService.findOneUserById(id_user_valid, null, function (err, value) {
             expect(value).to.be.a('object');
             expect(value).to.haveOwnProperty('_id')
-            expect(value).to.haveOwnProperty('username')
+            expect(value).to.haveOwnProperty('email')
             done()
 
         })
@@ -203,18 +197,18 @@ describe("findManyUsersById", () => {
 
 describe("updateOneUser", () => {
     it("Modifier un utilisateur correct. - S", (done) => {
-        UserService.updateOneUser(id_user_valid, { username: "dragon3000", firstname: "cracheurdefeu" }, null, function (err, value) {
+        UserService.updateOneUser(id_user_valid, { email: "dragon3000", firstname: "cracheurdefeu" }, null, function (err, value) {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
-            expect(value).to.haveOwnProperty('username')
+            expect(value).to.haveOwnProperty('email')
             expect(value).to.haveOwnProperty('firstname')
-            expect(value['username']).to.be.equal('dragon3000')
+            expect(value['email']).to.be.equal('dragon3000')
             done()
 
         })
     })
     it("Modifier un utilisateur avec id incorrect. - E", (done) => {
-        UserService.updateOneUser("1200", { username: "Zensuni", name: "AlexandrePorteron" }, null, function (err, value) {
+        UserService.updateOneUser("1200", { email: "Zensuni", name: "AlexandrePorteron" }, null, function (err, value) {
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('msg')
             expect(err).to.haveOwnProperty('type_error')
@@ -223,13 +217,13 @@ describe("updateOneUser", () => {
         })
     })
     it("Modifier un utilisateur avec des champs requis vide. - E", (done) => {
-        UserService.updateOneUser(id_user_valid, { username: "", firstname: "AlexandrePorteron", phone_number: "0102030405" }, null, function (err, value) {
+        UserService.updateOneUser(id_user_valid, { email: "", firstname: "AlexandrePorteron", phone_number: "0102030405" }, null, function (err, value) {
             expect(value).to.be.undefined
             expect(err).to.haveOwnProperty('msg')
             expect(err).to.haveOwnProperty('fields_with_error').with.lengthOf(1)
             expect(err).to.haveOwnProperty('fields')
-            expect(err['fields']).to.haveOwnProperty('username')
-            expect(err['fields']['username']).to.equal('Path `username` is required.')
+            expect(err['fields']).to.haveOwnProperty('email')
+            expect(err['fields']['email']).to.equal('Path `email` is required.')
             done()
         })
     })
@@ -240,7 +234,7 @@ describe("deleteOneUser", () => {
         UserService.deleteOneUser(id_user_valid, null, function (err, value) { 
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
-            expect(value).to.haveOwnProperty('username')
+            expect(value).to.haveOwnProperty('email')
             expect(value).to.haveOwnProperty('email')
             done()
 

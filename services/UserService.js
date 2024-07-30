@@ -12,8 +12,8 @@ var User = mongoose.model('User', UserSchema)
 
 User.createIndexes()
 
-module.exports.loginUser = async function (username, password, options, callback) {
-    module.exports.findOneUser(['username', 'email'], username, null, async (err, value) => {
+module.exports.loginUser = async function (email, password, options, callback) {
+    module.exports.findOneUser(["email"] ,email, null, async (err, value) => {
         if(err)
             callback(err)
         else {

@@ -15,10 +15,9 @@ describe("POST - /register", () => {
         chai.request(server).post('/register').send({
             firstname: "Test",
             lastname: "Test",
-            username: "betatest",
             email: "testeur@gmail.com",
             password: "azerty",
-            phone_number: 1234567890,
+            phone_number: "1234567890"
         }).end((err, res) => {
             expect(res).to.have.status(201)
             users.push(res.body)
@@ -28,20 +27,20 @@ describe("POST - /register", () => {
     it("Ajouter un utilisateur incorrect. (Sans firstname) - E", (done) => {
         chai.request(server).post('/register').send({
             lastname: 'Us',
-            username: 'dwarfSlayr',
             email: 'lutfu.us@gmil.com',
+            phone_number: "1234567890",
             password: "azerty"
         }).end((err, res) => {
             expect(res).to.have.status(405)
             done()
         })
     })
-    it("Ajouter un utilisateur incorrect. (Avec username déjà existant) - E", (done) => {
+    it("Ajouter un utilisateur incorrect. (Avec email déjà existant) - E", (done) => {
         chai.request(server).post('/register').send({
             firstname: "luf",
             lastname: "Us",
-            username: "test",
-            email: "test@gmail.com",
+            email: "testeur@gmail.com",
+            phone_number: "1234567890",
             password: "azerty"
         }).end((err, res) => {
             expect(res).to.have.status(405)
@@ -52,8 +51,8 @@ describe("POST - /register", () => {
         chai.request(server).post('/register').send({
             firstname: "luffu",
             lastname: "",
-            username: "dwarfSlaye",
             email: "lufu.us@gmai.com",
+            phone_number: "1234567890",
             password: "azerty"
         }).end((err, res) => {
             expect(res).to.have.status(405)
@@ -64,6 +63,7 @@ describe("POST - /register", () => {
 
 describe("POST - /login", () => {
     it("Connexion utilisateur - S", (done) => {
+        console.log(users)
         chai.request(server).post('/login').send({
             email: "testeur@gmail.com",
             password: "azerty"
@@ -101,7 +101,7 @@ describe("POST - /add_users", () => {
           lastname: "BERNIER",
           username: "edbernie",
           email: "edouard.bernierrr@155.fr",
-          phone_number: 1234567890,
+          phone_number: "1234567890",
           password: "azerty"
         },
         {
@@ -109,7 +109,7 @@ describe("POST - /add_users", () => {
           lastname: "BERNIER",
           username: "edbernie123",
           email: "edouard.bernier5455@155.fr",
-          phone_number: 1234567890,
+          phone_number: "1234567890",
           password: "azerty"
         }])
         .end((err, res) => {
@@ -124,7 +124,7 @@ describe("POST - /add_users", () => {
           lastname: "User",
           username: "seconduser",
           email: "seconduser@test.fr",
-          phone_number: 1234567890,
+          phone_number: "1234567890",
           password: "mdpmdp"
         },
         {
@@ -132,7 +132,7 @@ describe("POST - /add_users", () => {
           lastname: "User",
           username: "thirduser",
           email: "thirduser@test.fr",
-          phone_number: 1234567890,
+          phone_number: "1234567890",
           password: "azerty"
         }])
         .auth(token, { type: 'bearer' }) 
@@ -144,11 +144,11 @@ describe("POST - /add_users", () => {
       })
   it("Ajout de plusieurs utilisateurs incorrects (sans firstname). - E", (done) => {
     chai.request(server).post('/add_users').send([{
-      firstname:"",
+      firstname: "",
       lastname: "BERNIER",
       username: "edbernie13",
       email: "edouard.bernier546@155.fr",
-      phone_number: 1234567890,
+      phone_number: "1234567890",
       password: "azerty"
     },
     {
@@ -156,7 +156,7 @@ describe("POST - /add_users", () => {
       lastname: "BERNIER",
       username: "edbernie124",
       email: "edouard.bernie6@155.fr",
-      phone_number: 1234567890,
+      phone_number: "1234567890",
       password: "azerty"
     }])
     .auth(token, { type: 'bearer' }) 
@@ -165,21 +165,21 @@ describe("POST - /add_users", () => {
       done()
     })
   })
-  it("Ajout de plusieurs utilisateurs incorrects (avec un username existant). - E", (done) => {
+  it("Ajout de plusieurs utilisateurs incorrects (avec un email existant). - E", (done) => {
     chai.request(server).post('/add_users').send([{
       firstname: "First",
       lastname: "User",
       username: "betatest",
-      email: "edouard@155.fr",
-      phone_number: 1234567890,
+      email: "testeur@gmail.com",
+      phone_number: "1234567890",
       password: "azerty"
     },
     {
       firstname: "Edouard",
       lastname: "BERNIER",
       username: "betatest",
-      email: "edouard.bernier5455@155.fr",
-      phone_number: 1234567890,
+      email: "seconduser@test.fr",
+      phone_number: "1234567890",
       password: "azerty"
     }])
     .auth(token, { type: 'bearer' }) 
@@ -193,17 +193,16 @@ describe("POST - /add_users", () => {
     .send([{
       firstname: "jesuisunprenom",
       lastname: "jesuisunnom",
-      username: "pseudocorrect",
       email: "uneadresse@mail.fr",
       phone_number: 1234567890,
-      password: "azerty"
+      password: ""
     },
     {
       firstname: "Mathou",
       lastname: "",
       username: "tissoubebou",
       email: "lufu.us@gmailop.com",
-      phone_number: 1234567890,
+      phone_number: "1234567890",
       password: "azerty"
   }])
     .auth(token, { type: 'bearer' }) 
@@ -223,8 +222,8 @@ describe("GET - /find_user", () => {
         })
     })
     it("Rechercher un utilisateur avec un champ valide. - S", (done) => {
-        chai.request(server).get('/find_user').query({fields: ['username'], value: users[0].username})
-        .auth(token, { type: 'bearer' }) 
+        chai.request(server).get('/find_user').query({fields: ['email'], value: users[0].email})
+        .auth(token, { type: 'bearer' })
         .end((err, res) => {
             res.should.have.status(200)
             done()

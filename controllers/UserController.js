@@ -31,10 +31,9 @@ const passport = require("passport");
 *        500:
 *          description: Internal server error.
 */
-
 // la fonction pour gérer l'authentification depuis UserService
 module.exports.loginUser = function(req, res, next) {
-  const { email, password } = req.body;
+  const {email, password } = req.body;
 
   // console.log("Requête de connexion reçue :", { email, password });
 
@@ -45,7 +44,7 @@ module.exports.loginUser = function(req, res, next) {
       return res.send({ msg: err.msg, type_error: err.type_error });
     }
 
-    // console.log("Utilisateur connecté :", user);
+    console.log("Utilisateur connecté :", user);
 
     // Ajouter le token à la réponse utilisateur
     res.statusCode = 200;
@@ -53,6 +52,35 @@ module.exports.loginUser = function(req, res, next) {
   });
 };
 
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Create a new user
+ *     description: Create a new user with the provided details.
+ *     tags: 
+ *       - User
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       405:
+ *          $ref: '#/components/responses/ValidationError'
+ *       500:
+ *         description: Internal server error.
+ */
 // La fonction permet d'ajouter un utilisateur
 module.exports.addOneUser = function (req, res) {
   LoggerHttp(req, res);
