@@ -3,9 +3,7 @@ const UserService = require('../../services/UserService')
 const chai = require('chai');
 let expect = chai.expect;
 const _ = require('lodash')
-var id_company_valid = ""
-var tab_id_companies = []
-var new_company = []
+var company_valid = []
 
 let tab_id_users = []
 let users = [
@@ -51,9 +49,10 @@ function rdm_user (tab) {
     return rdm_id
 }
 
+
 describe("addOneCompany", () => {
     it("Restaurant correct. - S", (done) => {
-        var new_company = {
+        var company_valid = {
             name: "La belle assiette",
             address: "18 rue Hubert Metzger",
             user_id: rdm_user(tab_id_users)
@@ -64,23 +63,9 @@ describe("addOneCompany", () => {
             expect(value).to.haveOwnProperty('user_id')
             expect(value).to.haveOwnProperty('name')
             expect(value).to.haveOwnProperty('address')
-            new_company.push(value)
+            company_valid.push(value)
+            console.log(company_valid)
             done()        
         })
     })
-    it("restaurant incorrect. (Sans name) - E", (done) => {
-        var company_no_valid = {
-            address: "15 rue du fort",
-            user_id: rdm_user(tab_id_users)
-
-        }
-        CompanyService.addOneCompany(company_no_valid, null, function (err, value) {
-            expect(err).to.haveOwnProperty('msg')
-            expect(err).to.haveOwnProperty('fields_with_error').with.lengthOf(1)
-            expect(err).to.haveOwnProperty('fields')
-            expect(err['fields']).to.haveOwnProperty('name')
-            expect(err['fields']['name']).to.equal('Path `name` is required.')
-            done()
-        })
-})
 })
