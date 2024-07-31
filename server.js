@@ -90,8 +90,8 @@ app.post('/add_company', DatabaseMiddleware.checkConnection, passport.authentica
 // Création du endpoint /add_companies pour l'ajout d'un restaurant
 app.post('/add_companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addManyCompanies)
 
-// Création du endpoint /companies pour la recherche de restaurants
-app.post('/companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.findManyCompanies)
+// Création du endpoint /companies_by_filters pour la recherche de restaurants avex filtres
+app.get('/companies_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.findManyCompanies)
 
 app.listen(Config.port, () => {
   Logger.info(`Serveur démarré sur le port ${Config.port}`)

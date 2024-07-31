@@ -219,7 +219,7 @@ describe("findManyCompanies", () => {
             expect(value["count"]).to.equal(4)
             expect(value["results"]).lengthOf(3)
             expect(err).to.be.null
-            console.log(value)
+            // console.log(value)
             done()
         })
     })
