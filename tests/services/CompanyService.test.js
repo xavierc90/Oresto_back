@@ -213,7 +213,6 @@ describe("addManyCompanies", () => {
 })
 
 // Recherche d'un restaurant
-
 describe("findOneCompany", () => {
     it("Chercher un restaurant par les champs séléctionnés. - S", (done) => {
         CompanyService.findOneCompany(["name", "address"],  companies[0].name, null, function(err, value) {
@@ -333,6 +332,7 @@ describe("updateOneCompany", () => {
     })
 })
 
+// Modifier plusieurs restaurants
 describe("updateManyCompanies", () => {
     it("Modifier plusieurs restaurants correctement. - S", (done) => {
         CompanyService.updateManyCompanies(tab_id_companies, { name: "Restaurant pour test updateManyCompanies", address: "18 rue du Général" }, null, function (err, value) {
@@ -365,6 +365,7 @@ describe("updateManyCompanies", () => {
     })
 })
 
+// Supprimer un restaurant
 describe("deleteOneCompany", () => {
     it("Supprimer un restaurant correct. - S", (done) => {
         CompanyService.deleteOneCompany(id_company_valid, null, function (err, value) {
@@ -395,7 +396,7 @@ describe("deleteOneCompany", () => {
     })
 })
 
-
+// Supprimer plusieurs restaurants
 describe("deleteManyCompanies", () => {
     it("Supprimer plusieurs restaurants avec id incorrect. - E", (done) => {
         CompanyService.deleteManyCompanies("1200", null, function (err, value) {
