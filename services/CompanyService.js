@@ -204,7 +204,6 @@ module.exports.findManyCompaniesById = function (companies_id, options, callback
 }
 
 // Fonction pour modifier un restaurant
-
 module.exports.updateOneCompany = function (company_id, update, options, callback) {
     if (company_id && mongoose.isValidObjectId(company_id)) {
         update.updated_at = new Date();
@@ -213,9 +212,10 @@ module.exports.updateOneCompany = function (company_id, update, options, callbac
                 if (value) {
                     callback(null, value.toObject())}
                 else {
-                    callback({ msg: "Restaurant non trouvé.", type_error: "no-found" })
+                    callback({ msg: "article non trouvé.", type_error: "no-found" })
                 }
-            } catch (e) {   
+            } catch (e) {
+                
                 callback(e)
             }
         }).catch((errors) => {

@@ -4,7 +4,7 @@ const UserService = require('../../services/UserService')
 const chai = require('chai');
 let expect = chai.expect;
 const _ = require('lodash')
-var id_company_valid = []
+var id_company_valid = ""
 var tab_id_companies = []
 var companies = []
 
@@ -26,7 +26,7 @@ let users = [
         email:"client2@gmail.com",
         phone_number: "+33601020304",
         password: "azerty"
-    },    
+    },
     {
         firstname: "Client 3",
         lastname: "Réservation",
@@ -267,12 +267,10 @@ describe("findManyCompanies", () => {
 describe("findOneCompanyById", () => {
     it("Chercher un restaurant existant correct. - S", (done) => {
         CompanyService.findOneCompanyById(id_company_valid, null, (err, value) => {
-            expect(value).to.be.undefined;
             expect(err).to.be.a('object');
             expect(value).to.haveOwnProperty('_id')
             expect(value).to.haveOwnProperty('name')
-            // console.log(value)
-            // console.log(err)
+            // console.log(id_company_valid)
             done()
         })
     })
@@ -299,13 +297,14 @@ describe("findManyCompaniesById", () => {
 // Modification d'un restaurant
 describe("updateOneCompany", () => {
     it("Modifier un restaurant correct. - S", (done) => {
-        CompanyService.updateOneCompany(id_company_valid, { name: "Restaurant pour test", address: "Cette adresse est un test" }, null, function (err, value) {
+        CompanyService.updateOneCompany(id_company_valid, { name: "Restaurant test", postal_code: "25000" }, null, function (err, value) {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
             expect(value).to.haveOwnProperty('name')
-            expect(value).to.haveOwnProperty('address')
-            expect(value['name']).to.be.equal('Restaurant pour test')
-            expect(value['address']).to.be.equal('Cette adresse est un test')
+            expect(value).to.haveOwnProperty('postal_code')
+            expect(value['name']).to.be.equal('Restaurant test')
+            expect(value['postal_code']).to.be.equal('25000')
+            console.log(id_company_valid)
             done()
         })
     })
