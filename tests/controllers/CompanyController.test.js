@@ -7,6 +7,7 @@ const should = chai.should()
 const _ = require('lodash')
 let token = ""
 var company = []
+var companies = []
 
 let tab_id_users = []
 let users = [
@@ -67,6 +68,8 @@ describe("POST - /login", () => {
 })
 
 chai.use(chaiHttp)
+
+// Tests de la fonction pour l'ajout d'un restaurant
 
 describe("POST - /add_company", () => {
     it("Ajouter un restaurant - S", (done) => {
@@ -138,3 +141,115 @@ describe("POST - /add_company", () => {
         })
     })
 })
+
+// Tests de la fonction pour l'ajout de plusieurs restaurants
+
+describe("POST - /add_companies", () => {
+    it("Ajout de plusieurs restaurants. - S", (done) => {
+      chai.request(server).post('/add_companies').send([{
+        user_id: rdm_user(tab_id_users),
+        name: "La gazelle d'or",
+        address: "4, rue des 4 vents",
+        postal_code: "90000",
+        city: "Belfort",
+        country: "France",
+        phone_number: "+33601020304",
+        email: "contact@lagazelledor.fr"
+      },
+      {
+        user_id: rdm_user(tab_id_users),
+        name: "Le Saint Christophe",
+        address: "14 place d'Armes",
+        postal_code: "90000",
+        city: "Belfort",
+        country: "France",
+        phone_number: "+33601020304",
+        email: "contact@restaurantstchristophe.fr"
+      }])
+      .auth(token, { type: 'bearer' }) 
+      .end((err, res) => {
+        res.should.have.status(201)
+        companies.push(res.body)
+        done()
+      })
+    })
+    it("Ajout de plusieurs restaurants. - E (Unauthorized)", (done) => {
+        chai.request(server).post('/add_companies').send([{
+          user_id: rdm_user(tab_id_users),
+          name: "La gazelle d'or",
+          address: "4, rue des 4 vents",
+          postal_code: "90000",
+          city: "Belfort",
+          country: "France",
+          phone_number: "+33601020304",
+          email: "contact@lagazelledor.fr"
+        },
+        {
+          user_id: rdm_user(tab_id_users),
+          name: "Le Saint Christophe",
+          address: "14 place d'Armes",
+          postal_code: "90000",
+          city: "Belfort",
+          country: "France",
+          phone_number: "+33601020304",
+          email: "contact@restaurantstchristophe.fr"
+        }])
+        .end((err, res) => {
+          res.should.have.status(401)
+          companies.push(res.body)
+          done()
+        })
+      })
+    it("Ajout de plusieurs restaurants incorrects (sans nom). - E", (done) => {
+      chai.request(server).post('/add_companies').send([{
+        user_id: rdm_user(tab_id_users),
+        address: "4, rue des 4 vents",
+        postal_code: "90000",
+        city: "Belfort",
+        country: "France",
+        phone_number: "+33601020304",
+        email: "contact@lagazelledor.fr"
+      },
+      {
+        user_id: rdm_user(tab_id_users),
+        address: "14 place d'Armes",
+        postal_code: "90000",
+        city: "Belfort",
+        country: "France",
+        phone_number: "+33601020304",
+        email: "contact@restaurantstchristophe.fr"
+      }])
+      .auth(token, { type: 'bearer' }) 
+      .end((err, res) => {
+        res.should.have.status(405)
+        done()
+      })
+    })
+    it("Ajouter de plusieurs restaurants incorrects (Avec un champ vide). - E", (done) => {
+      chai.request(server).post('/add_companies').send([{
+        user_id: rdm_user(tab_id_users),
+        name: "",
+        address: "4, rue des 4 vents",
+        postal_code: "90000",
+        city: "Belfort",
+        country: "France",
+        phone_number: "+33601020304",
+        email: "contact@lagazelledor.fr"
+      },
+      {
+        user_id: rdm_user(tab_id_users),
+        name: "",
+        address: "14 place d'Armes",
+        postal_code: "90000",
+        city: "Belfort",
+        country: "France",
+        phone_number: "+33601020304",
+        email: "contact@restaurantstchristophe.fr"
+      }])
+    .auth(token, { type: 'bearer' }) 
+    .end((err, res) => {
+          expect(res).to.have.status(405)
+          done()
+      })
+  })
+  })

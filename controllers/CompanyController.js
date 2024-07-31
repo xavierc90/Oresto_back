@@ -1,6 +1,6 @@
 const CompanyService = require('../services/CompanyService')
 
-// La fonction permet d'ajouter un article.
+// La fonction permet d'ajouter un restaurant.
 module.exports.addOneCompany = function(req, res) {
   req.log.info("Création d'un restaurant")
   var options = {user: req.user}
@@ -17,6 +17,21 @@ module.exports.addOneCompany = function(req, res) {
       res.statusCode = 405
       res.send(err)
     }else {
+      res.statusCode = 201
+      res.send(value)
+    }
+  })
+}
+
+// La fonction permet d'ajouter plusieurs restaurants.
+module.exports.addManyCompanies = function(req, res) {
+  req.log.info("Création de plusieurs restaurants")
+  CompanyService.addManyCompanies(req.body,null, function(err, value) {
+    if (err) {
+      res.statusCode = 405
+      res.send(err)
+    }
+    else {
       res.statusCode = 201
       res.send(value)
     }

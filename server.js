@@ -87,6 +87,9 @@ app.delete('/delete_users', DatabaseMiddleware.checkConnection, passport.authent
 // Création du endpoint /company pour l'ajout d'un restaurant
 app.post('/add_company', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany)
 
+// Création du endpoint /company pour l'ajout d'un restaurant
+app.post('/add_companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addManyCompanies)
+
 // Création du endpoint /companies pour l'ajout d'un restaurant
 // app.post('/companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany)
 
