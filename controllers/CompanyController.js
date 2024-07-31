@@ -37,3 +37,26 @@ module.exports.addManyCompanies = function(req, res) {
     }
   })
 }
+
+// La fonction permet de rechercher plusieurs restaurants.
+module.exports.findManyCompanies = function(req, res) {
+  req.log.info("Chercher plusieurs articles")
+  let page = req.query.page
+  let pageSize = req.query.pageSize
+  let search = req.query.q
+  var opts = { populate: req.query.populate }
+  CompanyService.findManyCompanies(search, page, pageSize, opts, function(err, value) {
+    if (err && err.type_error == "no-valid") {
+      res.statusCode = 405
+      res.send(err)
+    }
+    else if (err && err.type_error == "error-mongo") {
+      res.statusCode = 500
+      res.send(err)
+    }
+    else {
+      res.statusCode = 200
+      res.send(value)
+    }
+  })
+}

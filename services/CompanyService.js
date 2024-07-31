@@ -92,3 +92,59 @@ module.exports.addManyCompanies = async function (companies, options, callback) 
         }
     }
 }
+
+// Tests de la fonction pour la recherche de plusieurs restaurants
+
+module.exports.findManyCompanies = function (tab_field, values, options, callback) {
+    const validFields = ['name', 'address', 'postal_code', 'city', 'country'];
+    const minSearchLength = 2;
+
+    if (!Array.isArray(tab_field) || tab_field.length === 0) {
+        return callback({
+            msg: 'Les champs de recherche doivent être un tableau.',
+            type_error: 'no-valid'
+        });
+    }
+
+    if (!Array.isArray(values) || values.length !== tab_field.length || values.some(value => value.length < minSearchLength)) {
+        return callback({
+            msg: 'Chaque valeur de recherche doit contenir au moins deux caractères.',
+            type_error: 'no-valid'
+        });
+    }
+
+    const invalidFields = tab_field.filter(field => !validFields.includes(field));
+    if (invalidFields.length > 0) {
+        return callback({
+            msg: `Les champs (${invalidFields.join(',')}) ne sont pas des champs de recherche autorisés.`,
+            type_error: 'no-valid',
+            field_not_authorized: invalidFields
+        });
+    }
+
+    const query = {
+        $and: tab_field.map((field, index) => ({
+            [field]: { $regex: new RegExp(values[index], 'i') }
+        }))
+    };
+
+    const opts = { populate: options && options.populate ? ['user_id'] : [] };
+
+    Company.find(query, null, opts)
+        .then(results => {
+            if (results.length > 0) {
+                callback(null, results);
+            } else {
+                callback({
+                    msg: 'Aucun restaurant trouvé.',
+                    type_error: 'no-found'
+                });
+            }
+        })
+        .catch(err => {
+            callback({
+                msg: 'Erreur interne MongoDB.',
+                type_error: 'error-mongo'
+            });
+        });
+};

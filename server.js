@@ -84,14 +84,14 @@ app.delete('/delete_users', DatabaseMiddleware.checkConnection, passport.authent
 
 /*--------------------- Création des routes (Company - Restaurants) ---------------------*/
 
-// Création du endpoint /company pour l'ajout d'un restaurant
+// Création du endpoint /add_company pour l'ajout d'un restaurant
 app.post('/add_company', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany)
 
-// Création du endpoint /company pour l'ajout d'un restaurant
+// Création du endpoint /add_companies pour l'ajout d'un restaurant
 app.post('/add_companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addManyCompanies)
 
-// Création du endpoint /companies pour l'ajout d'un restaurant
-// app.post('/companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany)
+// Création du endpoint /companies pour la recherche de restaurants
+app.post('/companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.findManyCompanies)
 
 app.listen(Config.port, () => {
   Logger.info(`Serveur démarré sur le port ${Config.port}`)

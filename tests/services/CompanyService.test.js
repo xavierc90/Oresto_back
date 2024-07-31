@@ -1,3 +1,4 @@
+const e = require('express');
 const CompanyService = require('../../services/CompanyService')
 const UserService = require('../../services/UserService')
 const chai = require('chai');
@@ -124,7 +125,7 @@ describe("addManyCompanies", () => {
             address: "4, rue des 4 vents",
             postal_code: "90000",
             city: "Belfort",
-            country: "France",
+            country: "Espagne",
             phone_number: "+33601020304",
             email: "contact@lagazelledor.fr",
             user_id: rdm_user(tab_id_users)
@@ -179,4 +180,108 @@ describe("addManyCompanies", () => {
                 done()       
         })
     })
+    it("Restaurants incorrects (sans user_id). - E", (done) => {
+        var companies_no_valid = [{
+            name: "La gazelle d'or",
+            address: "4, rue des 4 vents",
+            postal_code: "90000",
+            city: "Belfort",
+            country: "France",
+            phone_number: "+33601020304",
+            email: "contact@lagazelledor.fr"
+        },
+        {
+            name: "Le Saint Christophe",
+            address: "14 place d'Armes",
+            postal_code: "90000",
+            city: "Belfort",
+            country: "France",
+            phone_number: "+33601020304",
+            email: "contact@restaurantstchristophe.fr"
+        }]
+        CompanyService.addManyCompanies(companies_no_valid, null, function (err, value) {
+            expect(err).to.be.an('Array').lengthOf(2)
+            err.forEach((error) => {
+                expect(error).to.have.property('fields_with_error').that.includes('user_id');
+                expect(error).to.have.property('fields').that.has.property('user_id', 'Path `user_id` is required.');
+            })
+            done()
+        })
+    })
 })
+
+// Test de la fonction pour l'ajout de plusieurs restaurants 
+
+describe('findManyCompanies', () => {
+    it('Rechercher des restaurants avec plusieurs champs - S', (done) => {
+        const tab_field = ['postal_code', 'country'];
+        const values = ['90', 'France']; // Recherche partielle
+        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
+            expect(err).to.be.null;
+            expect(results).to.be.an('array');
+            expect(results).to.have.length.greaterThan(0); // Ajustez en fonction des données présentes
+            results.forEach(result => {
+                expect(result.postal_code).to.include(values[0]);
+                expect(result.country).to.include(values[1]);
+            });
+        // console.log(results)
+            done();
+        });
+    });
+    it('Rechercher des restaurants avec un champs (name) - S', (done) => {
+        const tab_field = ['name'];
+        const values = ['La'];
+        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
+            expect(err).to.be.null;
+            expect(results).to.be.an('array');
+            expect(results).to.have.length.greaterThan(0); 
+            results.forEach(result => {
+                expect(result.name).to.include(values);
+            });
+        // console.log(results)
+            done();
+        });
+    });
+    it('Rechercher des restaurants avec un champs (city) - S', (done) => {
+        const tab_field = ['city'];
+        const values = ['Bel'];
+        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
+            expect(err).to.be.null;
+            expect(results).to.be.an('array');
+            expect(results).to.have.length.greaterThan(0); 
+            results.forEach(result => {
+                expect(result.city).to.include(values);
+            });
+        // console.log(results)
+            done();
+        });
+    });
+    it('Rechercher des restaurants avec un champs (country) - S', (done) => {
+        const tab_field = ['country'];
+        const values = ['Es'];
+        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
+            expect(err).to.be.null;
+            expect(results).to.be.an('array');
+            expect(results).to.have.length.greaterThan(0); 
+            results.forEach(result => {
+                expect(result.country).to.include(values);
+            });
+        // console.log(results)
+            done();
+        });
+    });
+    it('Rechercher des restaurants avec un champs (postal_code) - S', (done) => {
+        const tab_field = ['postal_code'];
+        const values = ['90'];
+        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
+            expect(err).to.be.null;
+            expect(results).to.be.an('array');
+            expect(results).to.have.length.greaterThan(0); 
+            results.forEach(result => {
+                expect(result.postal_code).to.include(values);
+            });
+        // console.log(results)
+            done();
+        });
+    });
+});

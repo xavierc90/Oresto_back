@@ -253,3 +253,48 @@ describe("POST - /add_companies", () => {
       })
   })
   })
+
+// Tests de la fonction pour la récupération d'un restaurant
+
+module.exports.findOneCompany = function (tab_field, value, options, callback) {
+    // Liste des champs valides pour la recherche
+    const validFields = ['name', 'address', 'postal_code', 'city', 'country'];
+
+    // Vérification des options de population
+    const opts = { populate: options && options.populate ? ['user_id'] : [] };
+
+    // Validation des paramètres
+    if (!Array.isArray(tab_field)) {
+        return callback({ msg: "Les champs de recherche doivent être un tableau.", type_error: "no-valid" });
+    }
+
+    if (!value) {
+        return callback({ msg: "La valeur de recherche est vide.", type_error: "no-valid" });
+    }
+
+    // Vérification des champs valides
+    const invalidFields = _.difference(tab_field, validFields);
+    if (invalidFields.length > 0) {
+        return callback({
+            msg: `Les champs (${invalidFields.join(", ")}) ne sont pas des champs de recherche autorisés.`,
+            type_error: 'no-valid',
+            field_not_authorized: invalidFields
+        });
+    }
+
+    // Construction de la requête MongoDB
+    const query = { $or: tab_field.map(field => ({ [field]: value })) };
+
+    // Rechercher dans la base de données
+    Company.findOne(query, null, opts)
+        .then(result => {
+            if (result) {
+                callback(null, result.toObject());
+            } else {
+                callback({ msg: "Restaurant non trouvé.", type_error: "no-found" });
+            }
+        })
+        .catch(err => {
+            callback({ msg: "Erreur interne MongoDB.", type_error: "error-mongo" });
+        });
+};
