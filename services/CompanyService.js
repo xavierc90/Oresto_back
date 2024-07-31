@@ -215,8 +215,7 @@ module.exports.updateOneCompany = function (company_id, update, options, callbac
                 else {
                     callback({ msg: "Restaurant non trouvé.", type_error: "no-found" })
                 }
-            } catch (e) {
-                
+            } catch (e) {   
                 callback(e)
             }
         }).catch((errors) => {

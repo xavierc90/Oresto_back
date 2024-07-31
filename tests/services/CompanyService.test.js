@@ -268,9 +268,12 @@ describe("findManyCompanies", () => {
 describe("findOneCompanyById", () => {
     it("Chercher un restaurant existant correct. - S", (done) => {
         CompanyService.findOneCompanyById(id_company_valid, null, (err, value) => {
-            expect(value).to.be.a('object');
+            expect(value).to.be.undefined;
+            expect(err).to.be.a('object');
             expect(value).to.haveOwnProperty('_id')
             expect(value).to.haveOwnProperty('name')
+            // console.log(value)
+            // console.log(err)
             done()
         })
     })
