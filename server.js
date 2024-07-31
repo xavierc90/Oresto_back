@@ -85,10 +85,13 @@ app.delete('/delete_users', DatabaseMiddleware.checkConnection, passport.authent
 /*--------------------- Création des routes (Company - Restaurants) ---------------------*/
 
 // Création du endpoint /add_company pour l'ajout d'un restaurant
-app.post('/add_company', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany)
+app.post('/add_company/', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany)
 
 // Création du endpoint /add_companies pour l'ajout d'un restaurant
 app.post('/add_companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addManyCompanies)
+
+// Création du endpoint /find_company/:id pour la recherche de restaurants avex filtres
+app.get('/find_company/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.findOneCompanyById)
 
 // Création du endpoint /companies_by_filters pour la recherche de restaurants avex filtres
 app.get('/companies_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.findManyCompanies)

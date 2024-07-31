@@ -57,7 +57,7 @@ function rdm_user (tab) {
 describe("POST - /login", () => {
     it("Connexion utilisateur - S", (done) => {
         chai.request(server).post('/login').send({
-            email: "client2@gmail.com",
+            email: "client5@gmail.com",
             password: "azerty",
         }).end((err, res) => {
             res.should.have.status(200)
@@ -273,10 +273,9 @@ describe("GET - /companies_by_filters", () => {
         chai.request(server).get('/companies_by_filters').query({ page: 1, pageSize: 4})
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
-            // res.should.have.status(200)
-            // expect(res.body.results).to.be.an('array')
-            // expect(res.body.count).to.be.equal(4)
-            console.log(res.body.count)
+            res.should.have.status(200)
+            expect(res.body.results).to.be.an('array')
+            expect(res.body.count).to.be.equal(4)
             done()
         })
     })

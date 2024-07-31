@@ -4,10 +4,14 @@ const UserService = require('../../services/UserService')
 const chai = require('chai');
 let expect = chai.expect;
 const _ = require('lodash')
+var id_company_valid = []
+var tab_id_companies = []
 var companies = []
 
 
 let tab_id_users = []
+
+// Création des utilisateurs fictifs
 let users = [
     {
         firstname: "Client 1",
@@ -39,7 +43,7 @@ let users = [
     }
 ]
 
-// Création des utilisateurs fictifs
+// Test pour création des utilisateurs fictifs
 it("Création des utilisateurs fictifs", (done) => {
     UserService.addManyUsers(users, null, function (err, value) {
         tab_id_users = _.map(value, '_id')
@@ -55,7 +59,6 @@ function rdm_user (tab) {
 }
 
 // Ajout d'un restaurant 
-
 describe("addOneCompany", () => {
     it("Restaurant correct. - S", (done) => {
         var company_valid = {
@@ -209,8 +212,36 @@ describe("addManyCompanies", () => {
     })
 })
 
-// Recherche de plusieurs restaurants 
+// Recherche d'un restaurant
 
+describe("findOneCompany", () => {
+    it("Chercher un restaurant par les champs séléctionnés. - S", (done) => {
+        CompanyService.findOneCompany(["name", "address"],  companies[0].name, null, function(err, value) {
+            expect(value).to.haveOwnProperty('name')
+            done()
+        })
+    })
+    it("Chercher un restaurant avec un champ non autorisé. - E", (done) => {
+        CompanyService.findOneCompany(["email", "description"], companies[0].name, null, function(err, value) {
+            expect(err).to.haveOwnProperty('type_error')
+            done()
+        })
+    })
+    it("Chercher un restaurant sans tableau de champs. - E", (done) => {
+        CompanyService.findOneCompany("name", companies[0].name, null, function(err, value) {
+            expect(err).to.haveOwnProperty('type_error')
+            done()
+        })
+    })
+    it("Chercher un restaurant inexistant. - E", (done) => {
+        CompanyService.findOneCompany(["name"], "company[0].company", null, function(err, value) {
+            expect(err).to.haveOwnProperty('type_error')
+            done()
+        })
+    })
+})
+
+// Recherche de plusieurs restaurants 
 describe("findManyCompanies", () => {
     it("Retourne 3 restaurants sur les 4. - S", (done) => {
         CompanyService.findManyCompanies(null, 1, 3, null, function (err, value) {
@@ -230,5 +261,161 @@ describe("findManyCompanies", () => {
             expect(value).to.undefined
             done()
         })
+    })
+})
+
+// Rechercher un restaurant par son id
+describe("findOneCompanyById", () => {
+    it("Chercher un restaurant existant correct. - S", (done) => {
+        CompanyService.findOneCompanyById(id_company_valid, null, (err, value) => {
+            expect(value).to.be.a('object');
+            expect(value).to.haveOwnProperty('_id')
+            expect(value).to.haveOwnProperty('name')
+            done()
+        })
+    })
+    it("Chercher un restaurant non-existant - E", (done) => {
+        CompanyService.findOneCompanyById("100", null, function (err, value) {
+            expect(err).to.haveOwnProperty('msg')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err["type_error"]).to.equal('no-valid')
+            done()
+        })
+    })
+})
+
+// Rechercher plusieurs restaurants par id
+describe("findManyCompaniesById", () => {
+    it("Chercher des restaurants existants corrects. - S", (done) => {
+        CompanyService.findManyCompaniesById(tab_id_companies, null, function (err, value) {
+            expect(value).lengthOf(3)
+            done()
+        })
+    })
+})
+
+// Modification d'un restaurant
+describe("updateOneCompany", () => {
+    it("Modifier un restaurant correct. - S", (done) => {
+        CompanyService.updateOneCompany(id_company_valid, { name: "Restaurant pour test", address: "Cette adresse est un test" }, null, function (err, value) {
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(value).to.haveOwnProperty('name')
+            expect(value).to.haveOwnProperty('address')
+            expect(value['name']).to.be.equal('Restaurant pour test')
+            expect(value['address']).to.be.equal('Cette adresse est un test')
+            done()
+        })
+    })
+    it("Modifier un restaurant avec id incorrect. - E", (done) => {
+        CompanyService.updateOneCompany("1200", { name: "La gazelle d'or", address: "4, rue des 4 vents" }, null, function (err, value) {
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("Modifier un restaurant avec des champs requis vide. - E", (done) => {
+        CompanyService.updateOneCompany(id_company_valid, { name: "", address: "23 rue du coteau" }, null, function (err, value) {
+            expect(value).to.be.undefined
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err).to.haveOwnProperty('fields_with_error').with.lengthOf(1)
+            expect(err).to.haveOwnProperty('fields')
+            expect(err['fields']).to.haveOwnProperty('name')
+            expect(err['fields']['name']).to.equal('Path `name` is required.')
+            done()
+        })
+    })
+})
+
+describe("updateManyCompanies", () => {
+    it("Modifier plusieurs restaurants correctement. - S", (done) => {
+        CompanyService.updateManyCompanies(tab_id_companies, { name: "Restaurant pour test updateManyCompanies", address: "18 rue du Général" }, null, function (err, value) {
+            expect(value).to.haveOwnProperty('modifiedCount')
+            expect(value).to.haveOwnProperty('matchedCount')
+            expect(value['matchedCount']).to.be.equal(tab_id_companies.length)
+            expect(value['modifiedCount']).to.be.equal(tab_id_companies.length)
+            done()
+        })
+    })
+    it("Modifier plusieurs restaurants avec id incorrect. - E", (done) => {
+        CompanyService.updateManyCompanies("1200", { name: "Orangina", country: "Paris" }, null, function (err, value) {
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("Modifier plusieurs restaurants avec des champs requis vide. - E", (done) => {
+        CompanyService.updateManyCompanies(tab_id_companies, { name: "", country: "Italie" }, null, function (err, value) {
+            expect(value).to.be.undefined
+            expect(err).to.haveOwnProperty('msg')
+            expect(err).to.haveOwnProperty('fields_with_error').with.lengthOf(1)
+            expect(err).to.haveOwnProperty('fields')
+            expect(err['fields']).to.haveOwnProperty('name')
+            expect(err['fields']['name']).to.equal('Path `name` is required.')
+            done()
+        })
+    })
+})
+
+describe("deleteOneCompany", () => {
+    it("Supprimer un restaurant correct. - S", (done) => {
+        CompanyService.deleteOneCompany(id_company_valid, null, function (err, value) {
+            expect(err).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(value).to.haveOwnProperty('name')
+            expect(value).to.haveOwnProperty('city')
+            done()
+        })
+    })
+    it("Supprimer un restauant avec id incorrect. - E", (done) => {
+        CompanyService.deleteOneCompany("1200", null, function (err, value) {
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("Supprimer un restaurant avec un id inexistant. - E", (done) => {
+        CompanyService.deleteOneCompany("665f18739d3e172be5daf092", null, function (err, value) {
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+})
+
+
+describe("deleteManyCompanies", () => {
+    it("Supprimer plusieurs restaurants avec id incorrect. - E", (done) => {
+        CompanyService.deleteManyCompanies("1200", null, function (err, value) {
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("Supprimer plusieurs restaurants correctement. - S", (done) => {
+        CompanyService.deleteManyCompanies(tab_id_companies, null, function (err, value) {
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('deletedCount')
+            expect(value['deletedCount']).is.equal(tab_id_companies.length)
+            done()
+        })
+    })
+})
+
+// Vérifier la suppression des utilisateurs fictifs
+it("Supprimer les utilisateurs fictifs", (done) => {
+    UserService.deleteManyUsers(tab_id_users,null, function (err, value) {
+        done()
     })
 })
