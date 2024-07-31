@@ -4,9 +4,6 @@ const UserService = require('../../services/UserService')
 const chai = require('chai');
 let expect = chai.expect;
 const _ = require('lodash')
-var companies_no_valid = []
-var id_company_valid = []
-var tab_id_companies = []
 var companies = []
 
 
@@ -42,6 +39,7 @@ let users = [
     }
 ]
 
+// Création des utilisateurs fictifs
 it("Création des utilisateurs fictifs", (done) => {
     UserService.addManyUsers(users, null, function (err, value) {
         tab_id_users = _.map(value, '_id')
@@ -50,12 +48,13 @@ it("Création des utilisateurs fictifs", (done) => {
     })
 })
 
+// Fonction pour récupérer un user_id aléatoire
 function rdm_user (tab) {
     let rdm_id = tab[Math.floor(Math.random() * (tab.length-1) )]
     return rdm_id
 }
 
-// Test de la fonction pour l'ajout d'un restaurant 
+// Ajout d'un restaurant 
 
 describe("addOneCompany", () => {
     it("Restaurant correct. - S", (done) => {
@@ -116,7 +115,7 @@ describe("addOneCompany", () => {
     })
 })
 
-// Test de la fonction pour l'ajout de plusieurs restaurants 
+// Ajout de plusieurs restaurants 
 
 describe("addManyCompanies", () => {
     it("Restaurants corrects. - S", (done) => {
@@ -210,78 +209,26 @@ describe("addManyCompanies", () => {
     })
 })
 
-// Test de la fonction pour l'ajout de plusieurs restaurants 
+// Recherche de plusieurs restaurants 
 
-describe('findManyCompanies', () => {
-    it('Rechercher des restaurants avec plusieurs champs - S', (done) => {
-        const tab_field = ['postal_code', 'country'];
-        const values = ['90', 'France']; // Recherche partielle
-        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
-            expect(err).to.be.null;
-            expect(results).to.be.an('array');
-            expect(results).to.have.length.greaterThan(0); // Ajustez en fonction des données présentes
-            results.forEach(result => {
-                expect(result.postal_code).to.include(values[0]);
-                expect(result.country).to.include(values[1]);
-            });
-        // console.log(results)
-            done();
-        });
-    });
-    it('Rechercher des restaurants avec un champs (name) - S', (done) => {
-        const tab_field = ['name'];
-        const values = ['La'];
-        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
-            expect(err).to.be.null;
-            expect(results).to.be.an('array');
-            expect(results).to.have.length.greaterThan(0); 
-            results.forEach(result => {
-                expect(result.name).to.include(values);
-            });
-        // console.log(results)
-            done();
-        });
-    });
-    it('Rechercher des restaurants avec un champs (city) - S', (done) => {
-        const tab_field = ['city'];
-        const values = ['Bel'];
-        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
-            expect(err).to.be.null;
-            expect(results).to.be.an('array');
-            expect(results).to.have.length.greaterThan(0); 
-            results.forEach(result => {
-                expect(result.city).to.include(values);
-            });
-        // console.log(results)
-            done();
-        });
-    });
-    it('Rechercher des restaurants avec un champs (country) - S', (done) => {
-        const tab_field = ['country'];
-        const values = ['Es'];
-        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
-            expect(err).to.be.null;
-            expect(results).to.be.an('array');
-            expect(results).to.have.length.greaterThan(0); 
-            results.forEach(result => {
-                expect(result.country).to.include(values);
-            });
-        // console.log(results)
-            done();
-        });
-    });
-    it('Rechercher des restaurants avec un champs (postal_code) - S', (done) => {
-        const tab_field = ['postal_code'];
-        const values = ['90'];
-        CompanyService.findManyCompanies(tab_field, values, null, (err, results) => {
-            expect(err).to.be.null;
-            expect(results).to.be.an('array');
-            expect(results).to.have.length.greaterThan(0); 
-            results.forEach(result => {
-                expect(result.postal_code).to.include(values);
-            });
-        // console.log(results)
-            done();
-        });
-    });
-});
+describe("findManyCompanies", () => {
+    it("Retourne 3 restaurants sur les 4. - S", (done) => {
+        CompanyService.findManyCompanies(null, 1, 3, null, function (err, value) {
+            expect(value).to.haveOwnProperty('count')
+            expect(value).to.haveOwnProperty('results')
+            expect(value["count"]).to.equal(4)
+            expect(value["results"]).lengthOf(3)
+            expect(err).to.be.null
+            console.log(value)
+            done()
+        })
+    })
+    it("Envoie chaine de caractère sur page - E", (done) => {
+        CompanyService.findManyCompanies(null, "coucou", 3, null,  function (err, value) {
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err["type_error"]).to.equal('no-valid')
+            expect(value).to.undefined
+            done()
+        })
+    })
+})

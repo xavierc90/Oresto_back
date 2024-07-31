@@ -70,7 +70,7 @@ module.exports.addManyCompanies = async function (companies, options, callback) 
         callback(errors);
     } else {
         try {
-            // Tenter d'insérer les articles
+            // Tenter d'insérer les restaurants
             const data = await Company.insertMany(companies, { ordered: false });
             callback(null, data);
         } catch (error) {
@@ -95,56 +95,29 @@ module.exports.addManyCompanies = async function (companies, options, callback) 
 
 // Tests de la fonction pour la recherche de plusieurs restaurants
 
-module.exports.findManyCompanies = function (tab_field, values, options, callback) {
-    const validFields = ['name', 'address', 'postal_code', 'city', 'country'];
-    const minSearchLength = 2;
-
-    if (!Array.isArray(tab_field) || tab_field.length === 0) {
-        return callback({
-            msg: 'Les champs de recherche doivent être un tableau.',
-            type_error: 'no-valid'
-        });
-    }
-
-    if (!Array.isArray(values) || values.length !== tab_field.length || values.some(value => value.length < minSearchLength)) {
-        return callback({
-            msg: 'Chaque valeur de recherche doit contenir au moins deux caractères.',
-            type_error: 'no-valid'
-        });
-    }
-
-    const invalidFields = tab_field.filter(field => !validFields.includes(field));
-    if (invalidFields.length > 0) {
-        return callback({
-            msg: `Les champs (${invalidFields.join(',')}) ne sont pas des champs de recherche autorisés.`,
-            type_error: 'no-valid',
-            field_not_authorized: invalidFields
-        });
-    }
-
-    const query = {
-        $and: tab_field.map((field, index) => ({
-            [field]: { $regex: new RegExp(values[index], 'i') }
-        }))
-    };
-
-    const opts = { populate: options && options.populate ? ['user_id'] : [] };
-
-    Company.find(query, null, opts)
-        .then(results => {
-            if (results.length > 0) {
-                callback(null, results);
+module.exports.findManyCompanies = function (search, page, limit, options, callback) {
+    page = !page ? 1 : parseInt(page)
+    limit = !limit ? 10 : parseInt(limit)
+    var populate = options && options.populate ? ['user_id'] : []
+    if (typeof page !== 'number' || typeof limit !== 'number' || isNaN(page) || isNaN(limit)) {
+        callback({msg: `format de ${typeof page !== 'number' ? 'page' : 'limit'} invalide.`, type_error: 'no-valid'});
+    } else {
+        let query_mongo = search ? {$or: _.map(["name", "postal_code", "city", "country"], (e) =>
+        { return {[e]: {$regex: search}} })} : {}
+        Company.countDocuments(query_mongo).then((value) => {
+            if (value > 0) {
+                const skip = ((page - 1) * limit);
+                Company.find(query_mongo, null, { skip: skip, limit: limit, populate: populate, lean: true}).then((results) => {
+                    callback(null, {
+                        results: results, 
+                        count: value 
+                    })
+                })
             } else {
-                callback({
-                    msg: 'Aucun restaurant trouvé.',
-                    type_error: 'no-found'
-                });
+                callback(null, { results: [], count: 0 });
             }
+        }).catch((e) => {
+            callback (e)
         })
-        .catch(err => {
-            callback({
-                msg: 'Erreur interne MongoDB.',
-                type_error: 'error-mongo'
-            });
-        });
-};
+    }
+}
