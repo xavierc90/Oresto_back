@@ -43,6 +43,7 @@ app.use(passport.session())
 
 const UserController = require('./controllers/UserController')
 const CompanyController = require('./controllers/CompanyController')
+const TableController = require('./controllers/TableController')
 
 const DatabaseMiddleware = require('./middlewares/database')
 const LoggerMiddleware = require('./middlewares/logger')
@@ -51,11 +52,17 @@ app.use(bodyParser.json(), LoggerMiddleware.addLogger)
 
 /*--------------------- Création des routes (User - Utilisateur) ---------------------*/
 
-// Création du endpoint /login pour connecter un utilisateur
-app.post('/login', DatabaseMiddleware.checkConnection, UserController.loginUser)
+// Création du endpoint /register_manager pour l'ajout d'un manager
+app.post('/register_manager', DatabaseMiddleware.checkConnection, UserController.addOneManager)
+
+// Création du endpoint /login_manager pour connecter un manager
+app.post('/login_manager', DatabaseMiddleware.checkConnection, UserController.loginManager)
 
 // Création du endpoint /register pour l'ajout d'un utilisateur
 app.post('/register', DatabaseMiddleware.checkConnection, UserController.addOneUser)
+
+// Création du endpoint /login pour connecter un utilisateur
+app.post('/login', DatabaseMiddleware.checkConnection, UserController.loginUser)
 
 // Création du endpoint /add_users pour l'ajout de plusieurs utilisateurs
 app.post('/add_users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.addManyUsers) 
@@ -95,6 +102,11 @@ app.get('/find_company/:id', DatabaseMiddleware.checkConnection, passport.authen
 
 // Création du endpoint /companies_by_filters pour la recherche de restaurants avex filtres
 app.get('/companies_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.findManyCompanies)
+
+
+/*--------------------- Création des routes (Table - Tables restaurant) ---------------------*/
+
+app.post('/add_table/', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), TableController.addOneTable)
 
 app.listen(Config.port, () => {
   Logger.info(`Serveur démarré sur le port ${Config.port}`)

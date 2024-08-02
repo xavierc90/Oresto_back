@@ -5,23 +5,23 @@ require('../utils/database')
 
 
 // Tests pour Users
-// describe("UserService", () => {
-//   require('./services/UserService.test')
-// })
+describe("UserService", () => {
+  require('./services/UserService.test')
+})
 
-// describe("UserController", () => {
-//   require('./controllers/UserController.test')
-// })
+describe("UserController", () => {
+  require('./controllers/UserController.test')
+})
 
 // Tests pour les companies (restaurants)
 
-describe("CompanyService", () => {
-  require('./services/CompanyService.test')
-})
+// describe("CompanyService", () => {
+//   require('./services/CompanyService.test')
+// })
 
-describe("CompanyController", () => {
-  require('./controllers/CompanyController.test')
-})
+// describe("CompanyController", () => {
+//   require('./controllers/CompanyController.test')
+// })
 
 // Tests pour réservations
 

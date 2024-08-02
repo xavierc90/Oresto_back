@@ -2,6 +2,52 @@ const UserService = require("../services/UserService");
 const LoggerHttp = require("../utils/logger").http;
 const passport = require("passport");
 
+// La fonction permet d'ajouter un manager
+module.exports.addOneManager = function (req, res) {
+  LoggerHttp(req, res);
+  req.log.info("Création d'un manager");
+  UserService.addOneManager(req.body, null, function (err, value) {
+    if (err && err.type_error == "no found") {
+      res.statusCode = 404;
+      res.send(err);
+    } else if (err && err.type_error == "validator") {
+      res.statusCode = 405;
+      res.send(err);
+    } else if (err && err.type_error == "duplicate") {
+      res.statusCode = 405;
+      res.send(err);
+    } else if (err && err.type_error == "error-mongo") {
+      res.statusCode = 500;
+      res.send(err);
+    } else {
+      res.statusCode = 201;
+      res.send(value);
+    }
+  });
+};
+
+// La fonction permet de connecter un manager
+module.exports.loginManager = function (req, res) {
+  LoggerHttp(req, res);
+  req.log.info("Connexion d'un manager");
+  const { email, password } = req.body;
+  UserService.loginManager(email, password, null, function (err, value) {
+    if (err && err.type_error == "no-found") {
+      res.statusCode = 404;
+      res.send({ msg: "Compte inexistant.", type_error: "no-found" });
+    } else if (err && err.type_error == "no-comparaison") {
+      res.statusCode = 401;
+      res.send(err);
+    } else if (err && err.type_error == "not-authorized") {
+      res.statusCode = 403;
+      res.send(err);
+    } else {
+      res.statusCode = 200;
+      res.send(value);
+    }
+  });
+};
+
 /**
  * @swagger
  * /register:

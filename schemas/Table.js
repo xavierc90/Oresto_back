@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId
+
 
 const TableSchema = mongoose.Schema({
   company_id: {
