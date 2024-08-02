@@ -195,7 +195,7 @@ module.exports.loginUser = async function (email, password, options, callback) {
 }
 
 module.exports.findOneUser = function (tab_field, value, options, callback) {
-    var field_unique = ["username", "email"];
+    var field_unique = ["email"];
     if (tab_field && Array.isArray(tab_field) && value && _.filter(tab_field, (e) => { return field_unique.indexOf(e) == -1}).length == 0) {
        var obj_find = [];
        _.forEach(tab_field, (e) => {
@@ -236,7 +236,7 @@ module.exports.findManyUsers = function (search, page, limit, options, callback)
     if (typeof page !== 'number' || typeof limit !== 'number' || isNaN(page) || isNaN(limit)) {
         callback({msg: `format de ${typeof page !== 'number' ? 'page' : 'limit'} invalide.`, type_error: 'no-valid'});
     } else {
-        let query_mongo = search ? {$or: _.map(["firstname", "lastname", "username", "phone_number", "email"], (e) =>
+        let query_mongo = search ? {$or: _.map(["firstname", "lastname", "phone_number", "email"], (e) =>
         { return {[e]: {$regex: search}} })} : {}
         User.countDocuments().then((value) => {
             if (value > 0) {
