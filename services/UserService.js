@@ -15,14 +15,17 @@ User.createIndexes()
 
 // Ajouter un manager
 module.exports.addOneManager = async function (user, options, callback) {
+    console.log("addOneManager called with user:", user);
     try {
         const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
-        if (user && user.password)
+        if (user && user.password) {
             user.password = await bcrypt.hash(user.password, salt);
+        }
         user.role = 'manager';
         var new_user = new User(user);
         var errors = new_user.validateSync();
         if (errors) {
+            console.log("Validation errors:", errors);
             errors = errors['errors'];
             var text = Object.keys(errors).map((e) => {
                 return errors[e]['properties']['message'];
@@ -42,6 +45,7 @@ module.exports.addOneManager = async function (user, options, callback) {
             callback(null, new_user.toObject());
         }
     } catch (error) {
+        console.error("Error in addOneManager:", error);
         if (error.code === 11000) { // Erreur de duplicité
             var field = Object.keys(error.keyValue)[0];
             var err = {
@@ -58,6 +62,7 @@ module.exports.addOneManager = async function (user, options, callback) {
 };
 
 module.exports.loginManager = async function (email, password, options, callback) {
+    console.log("loginManager called with email:", email);
     module.exports.findOneUser(["email"], email, null, async (err, value) => {
         if (err) {
             callback(err);
@@ -77,7 +82,6 @@ module.exports.loginManager = async function (email, password, options, callback
         }
     });
 };
-
 
 // Ajouter un client (utilisateur)
 module.exports.addOneUser = async function (user, options, callback) {

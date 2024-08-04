@@ -2,26 +2,35 @@ const CompanyService = require('../services/CompanyService')
 
 // La fonction permet d'ajouter un restaurant.
 module.exports.addOneCompany = function(req, res) {
-  req.log.info("Création d'un restaurant")
-  var options = {user: req.user}
-  CompanyService.addOneCompany(req.body,null, function(err, value) {
+  req.log.info("Création d'un restaurant");
+
+  // Vérifier le rôle de l'utilisateur
+  if (req.user.role !== 'manager') {
+    return res.status(403).send({ 
+      msg: "Vous n'êtes pas autorisé à créer une entreprise.",
+      type_error: "not-authorized"
+    });
+  }
+
+  var options = { user: req.user };
+  CompanyService.addOneCompany(req.body, options, function(err, value) {
     if (err && err.type_error == "no-found") {
-      res.statusCode = 404
-      res.send(err)
+      res.statusCode = 404;
+      res.send(err);
     }
     else if (err && err.type_error == "validator") {
-      res.statusCode = 405
-      res.send(err)
+      res.statusCode = 405;
+      res.send(err);
     }
     else if (err && err.type_error == "duplicate") {
-      res.statusCode = 405
-      res.send(err)
-    }else {
-      res.statusCode = 201
-      res.send(value)
+      res.statusCode = 405;
+      res.send(err);
+    } else {
+      res.statusCode = 201;
+      res.send(value);
     }
-  })
-}
+  });
+};
 
 // La fonction permet d'ajouter plusieurs restaurants.
 module.exports.addManyCompanies = function(req, res) {

@@ -6,35 +6,41 @@ const ObjectId = mongoose.Types.ObjectId
 
 var Company = mongoose.model('Company', CompanySchema)
 
-// Ajouter un restaurant //
+// Ajouter un restaurant
 module.exports.addOneCompany = async function (company, options, callback) {
     try {
-        company.user_id = options && options.user ? options.user._id: company.user_id
-        var new_company = new Company(company)
-        var errors = new_company.validateSync()
-        if (errors) {
-            errors = errors['errors']
-            var text = Object.keys(errors).map((e) => {
-                return errors[e]['properties']['message']
-            }).join(' ')
-            var fields = _.transform(Object.keys(errors), function (result, value) {
-                result[value] = errors[value]['properties']['message']
-            }, {})
-            var err = {
-                msg: text,
-                fields_with_error: Object.keys(errors),
-                fields: fields,
+        const newCompany = new Company({
+            ...company,
+            user_id: options.user._id
+        });
+        const savedCompany = await newCompany.save();
+
+        // Mettre à jour l'utilisateur avec l'ID de la nouvelle entreprise
+        const updatedUser = await User.findByIdAndUpdate(
+            options.user._id,
+            { company_id: savedCompany._id },
+            { new: true } // Cette option renvoie l'utilisateur mis à jour
+        );
+
+        callback(null, savedCompany.toObject());
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            callback({
+                msg: err.message,
+                fields_with_error: Object.keys(err.errors),
+                fields: err.errors,
                 type_error: "validator"
-            }
-            callback(err)
+            });
+        } else if (err.code === 11000) {
+            callback({
+                msg: 'Duplicate key error: company already exists.',
+                type_error: 'duplicate'
+            });
         } else {
-            await new_company.save()
-            callback(null, new_company.toObject())
+            callback(err);
         }
-    } catch (error) {
-            callback(error)
-        }
-}
+    }
+};
 
 // Ajouter plusieurs restaurants //
 
@@ -81,7 +87,7 @@ module.exports.addManyCompanies = async function (companies, options, callback) 
 
 module.exports.findOneCompany = function (tab_field, value, options, callback) {
     var opts = {populate: options && options.populate ? ['user_id'] : []}
-    var field_unique = ["name", "address", "city", "postal_code", "country"];
+    var field_unique = ["name", "address", "city", "postal_code", "country", "user_id"];
     
     if (tab_field && Array.isArray(tab_field) && value && _.filter(tab_field, (e) => { return field_unique.indexOf(e) == -1}).length == 0) {
        var obj_find = [];
@@ -151,7 +157,7 @@ module.exports.findManyCompanies = function (search, page, limit, options, callb
 
 // Fonction pour rechercher un restaurant avec son id
 module.exports.findOneCompanyById = function (company_id, options, callback) {
-    var opts = {populate: options && options.populate ? ['user_id'] : []}
+    var opts = { populate: options && options.populate ? ['user_id'] : [] }
     if (company_id && mongoose.isValidObjectId(company_id)) {
         Company.findById(company_id, null, opts).then((value) => {
             try {
@@ -160,8 +166,8 @@ module.exports.findOneCompanyById = function (company_id, options, callback) {
                 } else {
                     callback({ msg: "Aucun restaurant trouvé.", type_error: "no-found" });
                 }
-            }
-            catch (e) {
+            } catch (e) {
+                callback({ msg: "Erreur de traitement.", type_error: "error-mongo" });
             }
         }).catch((err) => {
             callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
@@ -170,6 +176,7 @@ module.exports.findOneCompanyById = function (company_id, options, callback) {
         callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' });
     }
 }
+
 
 // Fonction pour rechercher plusieurs restaurants avec leur id 
 module.exports.findManyCompaniesById = function (companies_id, options, callback) {
