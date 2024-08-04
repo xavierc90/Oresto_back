@@ -6,7 +6,7 @@ const ObjectId = mongoose.Types.ObjectId
 
 var Company = mongoose.model('Company', CompanySchema)
 
-// Ajouter un restaurant
+// Ajouter un restaurant //
 module.exports.addOneCompany = async function (company, options, callback) {
     try {
         const newCompany = new Company({
@@ -16,11 +16,7 @@ module.exports.addOneCompany = async function (company, options, callback) {
         const savedCompany = await newCompany.save();
 
         // Mettre à jour l'utilisateur avec l'ID de la nouvelle entreprise
-        const updatedUser = await User.findByIdAndUpdate(
-            options.user._id,
-            { company_id: savedCompany._id },
-            { new: true } // Cette option renvoie l'utilisateur mis à jour
-        );
+        await User.findByIdAndUpdate(options.user._id, { company_id: savedCompany._id });
 
         callback(null, savedCompany.toObject());
     } catch (err) {

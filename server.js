@@ -10,16 +10,20 @@ const swaggerUi = require('swagger-ui-express');
 // Création de notre application express.js
 const app = express();
 
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+//   next();
+// });
+
+// Ajout des headers pour les requêtes (CORS)
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'http://localhost:3000', // autoriser votre frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'Expires'],
 }));
 
-app.use((req, res, next) => {
-  res.setHeader('Another-Custom-Header', 'value');
-  next();
-});
 
 // Démarrage de la database
 require('./utils/database');
@@ -39,9 +43,6 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: true }
 }));
-
-// Ajout des headers pour les requêtes (CORS)
-app.use(cors());
 
 // Passport init
 app.use(passport.initialize());

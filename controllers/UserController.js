@@ -4,25 +4,31 @@ const passport = require("passport");
 
 // La fonction permet d'ajouter un manager
 module.exports.addOneManager = function (req, res) {
+  console.log("Request body: ", req.body);
   LoggerHttp(req, res);
   req.log.info("Création d'un manager");
+
   UserService.addOneManager(req.body, null, function (err, value) {
-    if (err && err.type_error == "no found") {
-      res.statusCode = 404;
-      res.send(err);
-    } else if (err && err.type_error == "validator") {
-      res.statusCode = 405;
-      res.send(err);
-    } else if (err && err.type_error == "duplicate") {
-      res.statusCode = 405;
-      res.send(err);
-    } else if (err && err.type_error == "error-mongo") {
-      res.statusCode = 500;
-      res.send(err);
-    } else {
-      res.statusCode = 201;
-      res.send(value);
+    if (err) {
+      console.error("Error in addOneManager: ", err);
+
+      if (err.type_error == "no found") {
+        res.statusCode = 404;
+      } else if (err.type_error == "validator") {
+        res.statusCode = 405;
+      } else if (err.type_error == "duplicate") {
+        res.statusCode = 405;
+      } else if (err.type_error == "error-mongo") {
+        res.statusCode = 500;
+      } else {
+        res.statusCode = 500; // Default to 500 for any other error
+      }
+
+      return res.send(err);
     }
+
+    res.statusCode = 201;
+    res.send(value);
   });
 };
 
