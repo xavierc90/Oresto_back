@@ -34,7 +34,7 @@ var UserSchema = mongoose.Schema({
     ],
     default: "user"
   },
-  token_reset: {
+  token: {
     type: String,
     required: false
   },

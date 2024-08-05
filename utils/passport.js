@@ -26,6 +26,9 @@ passport.use(new JWTStrategy({
     UserService.findOneUserById(jwt_payload._id, null, function (err, value) {
         if (err)
             done(err)
+        else if (value && !value.token) {
+            done(null, false, { message: 'Token expired' }, type_error = "no-valid")
+        }
         else
           done(null, value)
     })

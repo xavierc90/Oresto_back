@@ -99,7 +99,6 @@ describe("POST - /add_users", () => {
         .send([{
           firstname: "Second",
           lastname: "User",
-          username: "seconduser",
           email: "seconduser@test.fr",
           phone_number: "1234567890",
           password: "mdpmdp"
@@ -107,7 +106,6 @@ describe("POST - /add_users", () => {
         {
           firstname: "Third",
           lastname: "User",
-          username: "thirduser",
           email: "thirduser@test.fr",
           phone_number: "1234567890",
           password: "azerty"
@@ -230,7 +228,7 @@ describe("GET - /find_user", () => {
         })
     })
     it("Rechercher un utilisateur inexistant. - E", (done) => {
-        chai.request(server).get('/find_user').query({fields: ['username'], value: 'lutfu4846844'})
+        chai.request(server).get('/find_user').query({fields: ['email'], value: 'lutfu4846844'})
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
             res.should.have.status(404)

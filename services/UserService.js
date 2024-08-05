@@ -12,77 +12,6 @@ var User = mongoose.model('User', UserSchema)
 
 User.createIndexes()
 
-
-// Ajouter un manager
-module.exports.addOneManager = async function (user, options, callback) {
-    console.log("addOneManager called with user:", user);
-    try {
-        const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
-        if (user && user.password) {
-            user.password = await bcrypt.hash(user.password, salt);
-        }
-        user.role = 'manager';
-        var new_user = new User(user);
-        var errors = new_user.validateSync();
-        if (errors) {
-            console.log("Validation errors:", errors);
-            errors = errors['errors'];
-            var text = Object.keys(errors).map((e) => {
-                return errors[e]['properties']['message'];
-            }).join(' ');
-            var fields = _.transform(Object.keys(errors), function (result, value) {
-                result[value] = errors[value]['properties']['message'];
-            }, {});
-            var err = {
-                msg: text,
-                fields_with_error: Object.keys(errors),
-                fields: fields,
-                type_error: "validator"
-            };
-            callback(err);
-        } else {
-            await new_user.save();
-            callback(null, new_user.toObject());
-        }
-    } catch (error) {
-        console.error("Error in addOneManager:", error);
-        if (error.code === 11000) { // Erreur de duplicité
-            var field = Object.keys(error.keyValue)[0];
-            var err = {
-                msg: `Duplicate key error: ${field} must be unique.`,
-                fields_with_error: [field],
-                fields: { [field]: `The ${field} is already taken.` },
-                type_error: "duplicate"
-            };
-            callback(err);
-        } else {
-            callback(error); // Autres erreurs
-        }
-    }
-};
-
-module.exports.loginManager = async function (email, password, options, callback) {
-    console.log("loginManager called with email:", email);
-    module.exports.findOneUser(["email"], email, null, async (err, value) => {
-        if (err) {
-            callback(err);
-        } else if (!value) {
-            callback({ msg: "Compte inexistant.", type_error: "no-found" });
-        } else {
-            if (bcrypt.compareSync(password, value.password)) {
-                if (value.role !== 'manager') {
-                    callback({ msg: "Vos droits ne vous permettent pas de vous connecter", type_error: "not-authorized" });
-                } else {
-                    var token = TokenUtils.createToken({ _id: value._id }, null);
-                    callback(null, { ...value, token: token });
-                }
-            } else {
-                callback({ msg: "La comparaison des mots de passe est fausse.", type_error: "no-comparaison" });
-            }
-        }
-    });
-};
-
 // Ajouter un client (utilisateur)
 module.exports.addOneUser = async function (user, options, callback) {
     try {
@@ -189,8 +118,10 @@ module.exports.loginUser = async function (email, password, options, callback) {
         else {
             if (bcrypt.compareSync(password, value.password)) {
                 var token = TokenUtils.createToken({ _id: value._id }, null)
+                module.exports.updateOneUser(value._id, { token: token }, null, (err, value) => {
                 callback(null, {...value, token: token})
-            }
+            })
+        }
             else {
                 callback({msg: "La comparaison des mots de passe est fausse.", type_error: "no-comparaison"})
             }

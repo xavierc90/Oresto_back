@@ -2,58 +2,6 @@ const UserService = require("../services/UserService");
 const LoggerHttp = require("../utils/logger").http;
 const passport = require("passport");
 
-// La fonction permet d'ajouter un manager
-module.exports.addOneManager = function (req, res) {
-  console.log("Request body: ", req.body);
-  LoggerHttp(req, res);
-  req.log.info("Création d'un manager");
-
-  UserService.addOneManager(req.body, null, function (err, value) {
-    if (err) {
-      console.error("Error in addOneManager: ", err);
-
-      if (err.type_error == "no found") {
-        res.statusCode = 404;
-      } else if (err.type_error == "validator") {
-        res.statusCode = 405;
-      } else if (err.type_error == "duplicate") {
-        res.statusCode = 405;
-      } else if (err.type_error == "error-mongo") {
-        res.statusCode = 500;
-      } else {
-        res.statusCode = 500; // Default to 500 for any other error
-      }
-
-      return res.send(err);
-    }
-
-    res.statusCode = 201;
-    res.send(value);
-  });
-};
-
-// La fonction permet de connecter un manager
-module.exports.loginManager = function (req, res) {
-  LoggerHttp(req, res);
-  req.log.info("Connexion d'un manager");
-  const { email, password } = req.body;
-  UserService.loginManager(email, password, null, function (err, value) {
-    if (err && err.type_error == "no-found") {
-      res.statusCode = 404;
-      res.send({ msg: "Compte inexistant.", type_error: "no-found" });
-    } else if (err && err.type_error == "no-comparaison") {
-      res.statusCode = 401;
-      res.send(err);
-    } else if (err && err.type_error == "not-authorized") {
-      res.statusCode = 403;
-      res.send(err);
-    } else {
-      res.statusCode = 200;
-      res.send(value);
-    }
-  });
-};
-
 /**
  * @swagger
  * /register:
@@ -192,6 +140,31 @@ module.exports.loginUser = function(req, res, next) {
     return res.send(user);
   });
 };
+
+
+// Déconnecter un utilisateur
+
+module.exports.logoutUser = function(req, res) {
+  req.log.info("Déconnexion d'un utilisateur");
+  UserService.updateOneUser(req.user_id, {token: ""}, null, function(err, value) {
+    if (err && err.type_error == "no-found") {
+      res.statusCode = 404
+      res.send(err)
+    }
+    else if (err && err.type_error == "validator") {
+      res.statusCode = 405
+      res.send(err)
+    }
+    else if (err && err.type_error == "duplicate") {
+      res.statusCode = 405
+      res.send(err)
+    }
+    else {
+      res.statusCode = 201
+      res.send ({message : "L'utilisateur est déconnecté"})
+    }
+  })
+}
 
 /**
  * @swagger
