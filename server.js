@@ -71,9 +71,6 @@ app.post('/register', DatabaseMiddleware.checkConnection, UserController.addOneU
 // Création du endpoint /login pour connecter un utilisateur
 app.post('/login', DatabaseMiddleware.checkConnection, UserController.loginUser);
 
-// Création du endpoint /logout pour la déconnexion d'un utilisateur
-app.post('/logout', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.logoutUser);
-
 // Création du endpoint /add_users pour l'ajout de plusieurs utilisateurs
 app.post('/add_users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.addManyUsers);
 
@@ -97,6 +94,10 @@ app.delete('/delete_user/:id', DatabaseMiddleware.checkConnection, passport.auth
 
 // Création du endpoint /delete_users pour la suppression de plusieurs utilisateurs
 app.delete('/delete_users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), UserController.deleteManyUsers);
+
+// Création du endpoint /logout pour la déconnexion d'un utilisateur
+app.post('/logout', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.logoutUser);
+
 
 /*--------------------- Création des routes (Company - Restaurants) ---------------------*/
 

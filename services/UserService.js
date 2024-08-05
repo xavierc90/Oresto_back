@@ -112,7 +112,7 @@ module.exports.addManyUsers = async function (users, options, callback) {
 };
 
 module.exports.loginUser = async function (email, password, options, callback) {
-    module.exports.findOneUser(["email"] ,email, null, async (err, value) => {
+    module.exports.findOneUser(["email"] , email, null, async (err, value) => {
         if(err)
             callback(err)
         else {

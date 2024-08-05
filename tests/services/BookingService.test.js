@@ -23,7 +23,6 @@ let users = [
     {
         firstName: "Detenteur de réservation 3",
         lastName: "Client",
-        username: "client3",
         email:"client3@gmail.com",
         phone_number: "+33601020304",
         password: "azerty"
@@ -31,7 +30,6 @@ let users = [
     {
         firstName: "Detenteur de réservation 4",
         lastName: "Client",
-        username: "client4",
         email:"client4@gmail.com",
         password: "azerty"
     }

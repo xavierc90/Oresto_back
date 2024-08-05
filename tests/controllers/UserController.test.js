@@ -112,9 +112,9 @@ describe("POST - /add_users", () => {
         }])
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
-          res.should.have.status(201)
-          users = [...users, ...res.body]
-          done()
+            res.should.have.status(200)
+            users = [...users, ...res.body]
+            done()
         })
       })
       it("Ajout de plusieurs utilisateurs. - E (Unauthorized)", (done) => {
@@ -122,7 +122,6 @@ describe("POST - /add_users", () => {
         .send([{
           firstname: "Edouard",
           lastname: "BERNIER",
-          username: "edbernie",
           email: "edouard.bernierrr@155.fr",
           phone_number: "1234567890",
           password: "azerty"
@@ -130,7 +129,6 @@ describe("POST - /add_users", () => {
         {
           firstname: "Edouard",
           lastname: "BERNIER",
-          username: "edbernie123",
           email: "edouard.bernier5455@155.fr",
           phone_number: "1234567890",
           password: "azerty"
@@ -144,7 +142,6 @@ describe("POST - /add_users", () => {
     chai.request(server).post('/add_users').send([{
       firstname: "",
       lastname: "BERNIER",
-      username: "edbernie13",
       email: "edouard.bernier546@155.fr",
       phone_number: "1234567890",
       password: "azerty"
@@ -152,7 +149,6 @@ describe("POST - /add_users", () => {
     {
       firstname:"",
       lastname: "BERNIER",
-      username: "edbernie124",
       email: "edouard.bernie6@155.fr",
       phone_number: "1234567890",
       password: "azerty"
@@ -167,7 +163,6 @@ describe("POST - /add_users", () => {
     chai.request(server).post('/add_users').send([{
       firstname: "First",
       lastname: "User",
-      username: "betatest",
       email: "testeur@gmail.com",
       phone_number: "1234567890",
       password: "azerty"
@@ -175,7 +170,6 @@ describe("POST - /add_users", () => {
     {
       firstname: "Edouard",
       lastname: "BERNIER",
-      username: "betatest",
       email: "seconduser@test.fr",
       phone_number: "1234567890",
       password: "azerty"
@@ -198,7 +192,6 @@ describe("POST - /add_users", () => {
     {
       firstname: "Mathou",
       lastname: "",
-      username: "tissoubebou",
       email: "lufu.us@gmailop.com",
       phone_number: "1234567890",
       password: "azerty"
@@ -221,7 +214,7 @@ describe("GET - /find_user", () => {
         })
     })
     it("Rechercher un utilisateur avec un champ valide. - E (Unauthorized)", (done) => {
-        chai.request(server).get('/find_user').query({fields: ['username'], value: users[0].username})
+        chai.request(server).get('/find_user').query({fields: ['email'], value: users[0].email})
         .end((err, res) => {
             res.should.have.status(401)
             done()
@@ -375,16 +368,6 @@ describe("PUT - /edit_user", () => {
             done()
         })
     })
-    // it("Modifier un utilisateur avec un champ unique existant. - E", (done) => {
-    //     chai.request(server).put('/edit_user/' + users[0]._id)
-    //     .send({username: users[0].username})
-    //     .auth(token, { type: 'bearer' })
-    //     .end((err, res) => {
-    //    // console.log(res.body)
-    //         res.should.have.status(405)
-    //         done()
-    //     })
-    // })    
 })
 
 
@@ -397,10 +380,11 @@ describe("DELETE - /delete_user", () => {
             done()
         })
     })
-    it("Supprimer un utilisateur. - E (Unauthorized)", (done) => {
-        chai.request(server).delete('/delete_user/' + users[1]._id)
+    it("supprimer un utilisateur incorrect (avec un id inexistant). - E", (done) => {
+        chai.request(server).delete('/delete_user/665f18739d3e172be5daf092')
+        .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
-            res.should.have.status(401)
+            res.should.have.status(404)
             done()
         })
     })

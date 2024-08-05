@@ -12,7 +12,6 @@ passport.deserializeUser((user, done) => done(null, user))
 
 passport.use('login', new localStrategy({ passReqToCallback: true }, function (req, email, password, done) {
     //création du systeme de login avec comparaison des mot de passe
-
     UserService.loginUser(email, password, null, done)
 })
 )
@@ -26,7 +25,7 @@ passport.use(new JWTStrategy({
     UserService.findOneUserById(jwt_payload._id, null, function (err, value) {
         if (err)
             done(err)
-        else if (value && !value.token) {
+        else if (value && value.token == "") {
             done(null, false, { message: 'Token expired' }, type_error = "no-valid")
         }
         else

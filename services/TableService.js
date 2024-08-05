@@ -1,9 +1,9 @@
 const Table = require('../schemas/Table')
 
-// Ajouter un restaurant //
+// Ajouter une table  //
 module.exports.addOneTable = async function (table, options, callback) {
     try {
-        table.user_id = options && options.user ? options.user._id:table.user_id
+        table.company_id = options && options.company ? options.company._id:table.company_id
         var new_table = new Table(table)
         var errors = new_table.validateSync()
         if (errors) {

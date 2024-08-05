@@ -6,6 +6,7 @@ let id_user_valid = ""
 var tab_id_users = []
 var users = []
 
+// TEST - Service pour ajouter un utilisteur
 describe("addOneUser", () => {
     it("Utilisateur correct. - S", (done) => {
         var user = {
@@ -44,7 +45,6 @@ describe("addOneUser", () => {
         let user_no_valid = {
             lastname: "test",
             firstname: "BernardDupont",
-            email: "berpont1",
             email: "bernard.dupont1@gmail.com",
             password: "123456",
             phone_number: 123456789
@@ -54,29 +54,29 @@ describe("addOneUser", () => {
             expect(err).to.haveOwnProperty('fields_with_error').with.lengthOf(1)
             expect(err).to.haveOwnProperty('fields')
             expect(err['fields']).to.haveOwnProperty('email')
-           // expect(err['fields']['email']).to.equal('Path `email` must be unique.')
-            done()
+           expect(err['fields']['email']).to.equal('The email is already taken.')
+           expect(err['msg']).to.equal('Duplicate key error: email must be unique.')
+        // console.log(err)    
+        done()
         })
     })
 })
 
+// Service pour ajouter plusieurs utilisteurs
+
 describe("addManyUsers", () => {
     it("Utilisateurs à ajouter, non valide. - E", (done) => {
         var users_tab_error = [{
-            email: "berpont3",
             email: "bernard.dupont3@gmail.com",
             password: "123456"
         }, {
-            email: "",
             email: "bernard.dupont4@gmail.com",
             password: "123456"
         },
         {
-            email: "berpont4",
             email: "bernard.dupon5t@gmail.com",
             password: "123456"
         }, {
-            email: "berpont5",
             email: "bernard.dupont6@gmail.com"
         }]
 
@@ -107,13 +107,15 @@ describe("addManyUsers", () => {
         }]
         UserService.addManyUsers(users_tab, null, function (err, value) {
             tab_id_users = _.map(value, '_id')
-            users = [...value, ...users]
+            users_tab = [...value, ...users]
            // id_user_valid = value._id
             expect(value).lengthOf(3)
             done()
         })
     })
 })
+
+
 
 describe("findOneUser", () => {
     it("Chercher un utilisateur par les champs selectionnées. - S", (done) => {

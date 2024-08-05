@@ -30,6 +30,7 @@ const passport = require("passport");
  *       500:
  *         $ref: '#/components/responses/MongoError'
  */
+
 // La fonction permet d'ajouter un utilisateur
 module.exports.addOneUser = function (req, res) {
   LoggerHttp(req, res);
@@ -86,7 +87,7 @@ module.exports.addManyUsers = function (req, res) {
       res.statusCode = 405;
       res.send(err);
     } else {
-      res.statusCode = 201;
+      res.statusCode = 200;
       res.send(value);
     }
   });
@@ -120,22 +121,15 @@ module.exports.addManyUsers = function (req, res) {
 *        500:
 *          $ref: '#/components/responses/InternalError'
 */
+
 // la fonction pour gérer l'authentification depuis UserService
 module.exports.loginUser = function(req, res, next) {
   const {email, password } = req.body;
-
-  // console.log("Requête de connexion reçue :", { email, password });
-
   UserService.loginUser(email, password, null, (err, user) => {
     if (err) {
-      // console.log("Erreur de connexion :", err);
       res.statusCode = 401;
       return res.send({ msg: err.msg, type_error: err.type_error });
     }
-
-    // console.log("Utilisateur connecté :", user);
-
-    // Ajouter le token à la réponse utilisateur
     res.statusCode = 200;
     return res.send(user);
   });
@@ -143,7 +137,6 @@ module.exports.loginUser = function(req, res, next) {
 
 
 // Déconnecter un utilisateur
-
 module.exports.logoutUser = function(req, res) {
   req.log.info("Déconnexion d'un utilisateur");
   UserService.updateOneUser(req.user_id, {token: ""}, null, function(err, value) {
