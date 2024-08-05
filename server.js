@@ -104,7 +104,7 @@ app.post('/logout', DatabaseMiddleware.checkConnection, passport.authenticate('j
 /*--------------------- Création des routes (Company - Restaurants) ---------------------*/
 
 // Création du endpoint /add_company pour l'ajout d'un restaurant
-app.post('/register_company/', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany);
+app.post('/add_company/', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addOneCompany);
 
 // Création du endpoint /add_companies pour l'ajout de plusieurs restaurants
 app.post('/add_companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.addManyCompanies);
