@@ -5,11 +5,12 @@ const server = require('./../../server')
 const should = chai.should()
 const _ = require('lodash')
 const passport = require('passport')
+const { checkUserRole } = require('../../utils/role')
 var users = []
 var token = ""
 chai.use(chaiHttp)
 
-
+// TESTS CONTROLLER - Ajouter un utilisateur
 describe("POST - /register", () => {
     it("Ajouter un utilisateur . - S", (done) => {
         chai.request(server).post('/register').send({
@@ -90,6 +91,46 @@ describe("POST - /login", () => {
             res.should.have.status(401)
             done()    
         })
+    })
+})
+
+// TESTS CONTROLLER - Ajouter un manager
+describe("POST - /register_manager", () => {
+    it("Ajouter un manager . - S", (done) => {
+        chai.request(server).post('/register_manager').send({
+            firstname: "The",
+            lastname: "Manager",
+            email: "themanager@gmail.com",
+            password: "azerty",
+            phone_number: "1234567890"
+        }).end((err, res) => {
+            expect(res).to.have.status(201)
+            users.push(res.body)
+            done()
+        });
+    })
+})
+
+// TESTS CONTROLLER - Connecter un manager
+describe("POST - /login_manager", () => {
+    it("Connecter un manager . - S", (done) => {
+        chai.request(server).post('/login_manager').send({
+            email: "themanager@gmail.com",
+            password: "azerty",
+        })
+        .end((err, res) => {
+            res.should.have.status(200)
+            done()
+        });
+    });
+    it("Connecter un user sans role manager . - E", (done) => {
+        chai.request(server).post('/login_manager').send({
+            email: "ttesteur@gmail.com",
+            password: "azerty",
+        }).end((err, res) => {
+            expect(res).to.have.status(401);
+            done();   
+        });
     })
 })
 

@@ -57,13 +57,15 @@ const LoggerMiddleware = require('./middlewares/logger');
 
 app.use(bodyParser.json(), LoggerMiddleware.addLogger);
 
-/*--------------------- Création des routes (User - Utilisateur) ---------------------*/
+/*--------------------- Création des routes (Manager - Restaurateur) ---------------------*/
 
 // Création du endpoint /register_manager pour l'ajout d'un manager
-// app.post('/register_manager', DatabaseMiddleware.checkConnection, UserController.addOneManager);
+app.post('/register_manager', DatabaseMiddleware.checkConnection, UserController.addOneManager);
 
 // Création du endpoint /login_manager pour connecter un manager
-// app.post('/login_manager', DatabaseMiddleware.checkConnection, UserController.loginManager);
+app.post('/login_manager', DatabaseMiddleware.checkConnection, UserController.loginManager);
+
+/*--------------------- Création des routes (User - Utilisateur) ---------------------*/
 
 // Création du endpoint /register pour l'ajout d'un utilisateur
 app.post('/register', DatabaseMiddleware.checkConnection, UserController.addOneUser);

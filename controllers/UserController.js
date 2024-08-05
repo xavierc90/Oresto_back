@@ -2,6 +2,48 @@ const UserService = require("../services/UserService");
 const LoggerHttp = require("../utils/logger").http;
 const passport = require("passport");
 
+// La fonction permet d'ajouter un manager
+module.exports.addOneManager = function (req, res) {
+  LoggerHttp(req, res);
+  req.log.info("Création d'un utilisateur");
+  const ManagerRole = {...req.body, role: "manager"};
+  UserService.addOneUser(ManagerRole, null, function (err, value) {
+    if (err && err.type_error == "no found") {
+      res.statusCode = 404;
+      res.send(err);
+    } else if (err && err.type_error == "validator") {
+      res.statusCode = 405;
+      res.send(err);
+    } else if (err && err.type_error == "duplicate") {
+      res.statusCode = 405;
+      res.send(err);
+    } else if (err && err.type_error == "error-mongo") {
+      res.statusCode = 500;
+      res.send(err);
+    } else {
+      res.statusCode = 201;
+      res.send(value);
+    }
+  });
+};
+
+// la fonction pour gérer l'authentification manager depuis UserService
+module.exports.loginManager = function(req, res, next) {
+  const {email, password } = req.body;
+  UserService.loginUser(email, password, null, (err, user) => {
+    if (err) {
+      res.statusCode = 401;
+      return res.send({ msg: "Authentication required.", type_error: "unauthorized" });
+    }
+    if (user.role !== "manager") {
+      res.status(403).send({ msg: "Accès refusé. Vous devez être un manager pour vous connecter.", type_error: "forbidden" });
+      return;
+    }
+    res.statusCode = 200;
+    return res.send(user);
+  });
+};
+
 /**
  * @swagger
  * /register:
