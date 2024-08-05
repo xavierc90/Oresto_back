@@ -5,9 +5,9 @@ require('../utils/database')
 
 
 // Tests pour Users
-// describe("UserService", () => {
-//   require('./services/UserService.test')
-// })
+describe("UserService", () => {
+  require('./services/UserService.test')
+})
 
 describe("UserController", () => {
   require('./controllers/UserController.test')

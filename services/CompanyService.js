@@ -6,40 +6,38 @@ const ObjectId = mongoose.Types.ObjectId
 
 var Company = mongoose.model('Company', CompanySchema)
 
-// Ajouter un restaurant //
+// Ajouter un restaurant
 module.exports.addOneCompany = async function (company, options, callback) {
     try {
-        const newCompany = new Company({
-            ...company,
-            user_id: options.user._id
-        });
-        const savedCompany = await newCompany.save();
-
-        // Mettre à jour l'utilisateur avec l'ID de la nouvelle entreprise
-        await User.findByIdAndUpdate(options.user._id, { company_id: savedCompany._id });
-
-        callback(null, savedCompany.toObject());
-    } catch (err) {
-        if (err.name === 'ValidationError') {
-            callback({
-                msg: err.message,
-                fields_with_error: Object.keys(err.errors),
-                fields: err.errors,
+        company.user_id = options && options.user ? options.user._id: company.user_id
+        var new_company = new Company(company);
+        var errors = new_company.validateSync();
+        if (errors) {
+            errors = errors['errors'];
+            var text = Object.keys(errors).map((e) => {
+                return errors[e]['properties']['message'];
+            }).join(' ');
+            var fields = _.transform(Object.keys(errors), function (result, value) {
+                result[value] = errors[value]['properties']['message'];
+            }, {});
+            var err = {
+                msg: text,
+                fields_with_error: Object.keys(errors),
+                fields: fields,
                 type_error: "validator"
-            });
-        } else if (err.code === 11000) {
-            callback({
-                msg: 'Duplicate key error: company already exists.',
-                type_error: 'duplicate'
-            });
-        } else {
+            };
             callback(err);
+        } else {
+            await new_company.save();
+            callback(null, new_company.toObject());
+        }
+    } catch (error) {
+            callback(error); // Autres erreurs
         }
     }
-};
+
 
 // Ajouter plusieurs restaurants //
-
 module.exports.addManyCompanies = async function (companies, options, callback) {
     var errors = [];
     // Vérifier les erreurs de validation
@@ -130,7 +128,7 @@ module.exports.findManyCompanies = function (search, page, limit, options, callb
         return callback({ msg: `Format de ${isNaN(page) ? 'page' : 'limit'} invalide.`, type_error: 'no-valid' });
     }
     
-    let query_mongo = search ? { $or: ["name", "postal_code", "city", "country"].map((field) => ({ [field]: { $regex: search, $options: 'i' } })) } : {};
+    let query_mongo = search ? { $or: ["name", "postal_code", "city", "country", "user_id"].map((field) => ({ [field]: { $regex: search, $options: 'i' } })) } : {};
     
     Company.countDocuments(query_mongo).then((count) => {
         if (count > 0) {
@@ -215,7 +213,7 @@ module.exports.updateOneCompany = function (company_id, update, options, callbac
                 if (value) {
                     callback(null, value.toObject())}
                 else {
-                    callback({ msg: "article non trouvé.", type_error: "no-found" })
+                    callback({ msg: "restaurant non trouvé.", type_error: "no-found" })
                 }
             } catch (e) {
                 
