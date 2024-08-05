@@ -55,6 +55,7 @@ module.exports.addOneUser = async function (user, options, callback) {
     }
 };
 
+// Ajouter plusieurs utilisateurs 
 module.exports.addManyUsers = async function (users, options, callback) {
   var errors = [];
   

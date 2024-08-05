@@ -36,8 +36,6 @@ module.exports.addOneCompany = async function (company, options, callback) {
         }
     }
 
-
-// Ajouter plusieurs restaurants //
 module.exports.addManyCompanies = async function (companies, options, callback) {
     var errors = [];
     // Vérifier les erreurs de validation
@@ -69,13 +67,28 @@ module.exports.addManyCompanies = async function (companies, options, callback) 
         callback(errors);
     } else {
         try {
-            // Tenter d'insérer les restaurants
+            // Tenter d'insérer les companies
             const data = await Company.insertMany(companies, { ordered: false });
             callback(null, data);
         } catch (error) {
-            callback(error);
+            if (error.code === 11000) { // Erreur de duplicité
+                const duplicateErrors = error.writeErrors.map(err => {
+                    const field = err.err.errmsg.split(" dup key: { ")[1].split(':')[0].trim(); // Big brain
+                    return {
+                        msg: `Duplicate key error: ${field} must be unique.`,
+                        fields_with_error: [field],
+                        fields: { [field]: `The ${field} is already taken.` },
+                        index: err.index,
+                        type_error: "duplicate"
+                    };
+                });
+                callback(duplicateErrors);
+            } else {
+                callback(error); // Autres erreurs
+            }
         }
-    }}
+    }
+};
 
 // Fonction pour la recherche d'un restaurant //
 

@@ -29,20 +29,22 @@ module.exports.addOneManager = function (req, res) {
 
 // la fonction pour gérer l'authentification manager depuis UserService
 module.exports.loginManager = function(req, res, next) {
-  const {email, password } = req.body;
+  const { email, password } = req.body;
+
   UserService.loginUser(email, password, null, (err, user) => {
     if (err) {
       res.statusCode = 401;
       return res.send({ msg: "Authentication required.", type_error: "unauthorized" });
     }
     if (user.role !== "manager") {
-      res.status(403).send({ msg: "Accès refusé. Vous devez être un manager pour vous connecter.", type_error: "forbidden" });
-      return;
+      res.statusCode = 403;
+      return res.send({ msg: "Accès refusé. Vous devez être un manager pour vous connecter.", type_error: "forbidden" });
     }
     res.statusCode = 200;
     return res.send(user);
   });
 };
+
 
 /**
  * @swagger

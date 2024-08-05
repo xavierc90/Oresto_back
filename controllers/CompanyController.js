@@ -3,12 +3,14 @@ const CompanyService = require('../services/CompanyService')
 // La fonction permet d'ajouter un restaurant.
 module.exports.addOneCompany = function(req, res) {
   req.log.info("Création d'un restaurant");
+
   if (req.user.role !== 'manager') {
     return res.status(403).send({ 
       msg: "Vous n'êtes pas autorisé à créer une entreprise.",
       type_error: "not-authorized"
     });
   }
+
   var options = { user: req.user };
   CompanyService.addOneCompany(req.body, options, function(err, value) {
     if (err && err.type_error == "no-found") {
@@ -32,7 +34,17 @@ module.exports.addOneCompany = function(req, res) {
 // La fonction permet d'ajouter plusieurs restaurants.
 module.exports.addManyCompanies = function(req, res) {
   req.log.info("Création de plusieurs restaurants")
-  CompanyService.addManyCompanies(req.body,null, function(err, value) {
+
+    // Vérifier le rôle de l'utilisateur
+    if (req.user.role !== 'manager') {
+      return res.status(403).send({ 
+        msg: "Vous n'êtes pas autorisé à créer une entreprise.",
+        type_error: "not-authorized"
+      });
+    }
+  
+  var options = { user: req.user };  
+  CompanyService.addManyCompanies(req.body,options, function(err, value) {
     if (err) {
       res.statusCode = 405
       res.send(err)
