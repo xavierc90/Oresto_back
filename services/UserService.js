@@ -10,6 +10,9 @@ const SALT_WORK_FACTOR = 10;
 
 var User = mongoose.model('User', UserSchema)
 
+UserSchema.set('toJSON',{virtuals:true})
+UserSchema.set('toObject',{virtuals:true})
+
 User.createIndexes()
 
 // Ajouter un client (utilisateur)
@@ -55,7 +58,6 @@ module.exports.addOneUser = async function (user, options, callback) {
     }
 };
 
-// Ajouter plusieurs utilisateurs 
 module.exports.addManyUsers = async function (users, options, callback) {
   var errors = [];
   
@@ -191,7 +193,7 @@ module.exports.findManyUsers = function (search, page, limit, options, callback)
 
 module.exports.findOneUserById = function (user_id, options, callback) {
     if (user_id && mongoose.isValidObjectId(user_id)) {
-        User.findById(user_id, null).then((value) => {
+        User.findById(user_id, null, {populate:["company"]}).then((value) => {
             try {
                 if (value) {
                     callback(null, value.toObject());

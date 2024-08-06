@@ -73,4 +73,10 @@ var UserSchema = mongoose.Schema({
   }
 })
 
+UserSchema.virtual('company',{
+  ref:'Company',
+  localField : '_id',
+  foreignField:'user_id',
+})
+
 module.exports = UserSchema
