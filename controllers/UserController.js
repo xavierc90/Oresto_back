@@ -277,7 +277,7 @@ module.exports.findOneUser = function (req, res) {
   });
 };
 
-// La fonction permet de chercher plusieurs utilisateurs
+// La fonction permet de chercher plusieurs utilisateurs avec pagination
 module.exports.findManyUsers = function(req, res) {
   req.log.info("Chercher plusieurs utilisateurs");
   let page = req.query.page;
@@ -285,6 +285,27 @@ module.exports.findManyUsers = function(req, res) {
   let search = req.query.q;
 
   UserService.findManyUsers(search, page, pageSize, function(err, value) {
+      if (err && err.type_error === "no-valid") {
+          res.statusCode = 405;
+          res.send(err);
+      } else if (err && err.type_error === "error-mongo") {
+          res.statusCode = 500;
+          res.send(err);
+      } else {
+          res.statusCode = 200;
+          res.send(value);
+      }
+  });
+};
+
+// La fonction permet de chercher plusieurs clients avec pagination
+module.exports.findManyClients = function(req, res) {
+  req.log.info("Chercher plusieurs clients");
+  let page = req.query.page;
+  let pageSize = req.query.pageSize;
+  let search = req.query.q;
+
+  UserService.findManyClients(search, page, pageSize, function(err, value) {
       if (err && err.type_error === "no-valid") {
           res.statusCode = 405;
           res.send(err);

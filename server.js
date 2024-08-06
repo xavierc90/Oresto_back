@@ -85,6 +85,9 @@ app.get('/find_user', DatabaseMiddleware.checkConnection, passport.authenticate(
 // Création du endpoint /users_by_filters pour la récupération de plusieurs utilisateurs
 app.get('/users_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findManyUsers);
 
+// Création du endpoint /users_by_filters pour la récupération de plusieurs utilisateurs
+app.get('/clients_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findManyClients);
+
 // Création du endpoint /find_users pour la récupération de plusieurs utilisateurs par id
 app.get('/find_users', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.findManyUsersById);
 

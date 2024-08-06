@@ -168,6 +168,7 @@ module.exports.findOneUser = function (tab_field, value, options, callback) {
         }
 }
 
+// La fonction permet de rechercher tous les utilisateurs 
 module.exports.findManyUsers = function(search, page, limit, callback) {
     page = !page ? 1 : parseInt(page);
     limit = !limit ? 10 : parseInt(limit);
@@ -197,6 +198,43 @@ module.exports.findManyUsers = function(search, page, limit, callback) {
         });
     }
 };
+
+// La fonction permet de retrouver les clients (role : user)
+
+module.exports.findManyClients = function(search, page, limit, callback) {
+    page = !page ? 1 : parseInt(page);
+    limit = !limit ? 10 : parseInt(limit);
+    
+    if (isNaN(page) || isNaN(limit)) {
+        callback({ msg: `Format de ${isNaN(page) ? 'page' : 'limit'} invalide.`, type_error: 'no-valid' });
+    } else {
+        let query_mongo = {
+            role: 'user',
+            ...(search ? {
+                $or: _.map(["firstname", "lastname", "phone_number", "email"], (e) => {
+                    return { [e]: { $regex: search, $options: 'i' } }; // Ajout de $options: 'i' pour insensible à la casse
+                })
+            } : {})
+        };
+
+        User.countDocuments(query_mongo).then((value) => {
+            if (value > 0) {
+                const skip = ((page - 1) * limit);
+                User.find(query_mongo, null, { skip: skip, limit: limit }).then((results) => {
+                    callback(null, { results: results, count: value });
+                }).catch((e) => {
+                    callback({ msg: "Erreur lors de la recherche des utilisateurs.", type_error: "error-mongo", error: e });
+                });
+            } else {
+                callback(null, { results: [], count: 0 });
+            }
+        }).catch((e) => {
+            callback({ msg: "Erreur lors du comptage des utilisateurs.", type_error: "error-mongo", error: e });
+        });
+    }
+};
+
+// La fonction permet de recherche un utilisateur par son ID
 
 module.exports.findOneUserById = function (user_id, options, callback) {
     if (user_id && mongoose.isValidObjectId(user_id)) {
