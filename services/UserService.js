@@ -168,28 +168,35 @@ module.exports.findOneUser = function (tab_field, value, options, callback) {
         }
 }
 
-module.exports.findManyUsers = function (search, page, limit, options, callback) {
-    page = !page ? 1 : parseInt(page)
-    limit = !limit ? 10 : parseInt(limit)
-    if (typeof page !== 'number' || typeof limit !== 'number' || isNaN(page) || isNaN(limit)) {
-        callback({msg: `format de ${typeof page !== 'number' ? 'page' : 'limit'} invalide.`, type_error: 'no-valid'});
+module.exports.findManyUsers = function(search, page, limit, callback) {
+    page = !page ? 1 : parseInt(page);
+    limit = !limit ? 10 : parseInt(limit);
+    
+    if (isNaN(page) || isNaN(limit)) {
+        callback({ msg: `Format de ${isNaN(page) ? 'page' : 'limit'} invalide.`, type_error: 'no-valid' });
     } else {
-        let query_mongo = search ? {$or: _.map(["firstname", "lastname", "phone_number", "email"], (e) =>
-        { return {[e]: {$regex: search}} })} : {}
-        User.countDocuments().then((value) => {
+        let query_mongo = search ? {
+            $or: _.map(["firstname", "lastname", "phone_number", "email"], (e) => {
+                return { [e]: { $regex: search, $options: 'i' } }; // Ajout de $options: 'i' pour insensible à la casse
+            })
+        } : {};
+        
+        User.countDocuments(query_mongo).then((value) => {
             if (value > 0) {
                 const skip = ((page - 1) * limit);
                 User.find(query_mongo, null, { skip: skip, limit: limit }).then((results) => {
                     callback(null, { results: results, count: value });
-                })
+                }).catch((e) => {
+                    callback({ msg: "Erreur lors de la recherche des utilisateurs.", type_error: "error-mongo", error: e });
+                });
             } else {
                 callback(null, { results: [], count: 0 });
             }
         }).catch((e) => {
-            callback (e)
-        })
+            callback({ msg: "Erreur lors du comptage des utilisateurs.", type_error: "error-mongo", error: e });
+        });
     }
-}
+};
 
 module.exports.findOneUserById = function (user_id, options, callback) {
     if (user_id && mongoose.isValidObjectId(user_id)) {
