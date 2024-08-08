@@ -118,6 +118,9 @@ app.get('/find_company/:id', DatabaseMiddleware.checkConnection, passport.authen
 // Création du endpoint /companies_by_filters pour la recherche de restaurants avex filtres
 app.get('/companies_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.findManyCompanies);
 
+// Création du endpoint /companies_by_filters pour la recherche de restaurants avex filtres
+app.get('/find_companies', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.findManyCompaniesById);
+
 // Création du endpoint /update_company/:id pour la recherche de restaurants avex filtres
 app.get('/update_company/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.updateOneCompany);
 

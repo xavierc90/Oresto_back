@@ -14,14 +14,13 @@ require('../utils/database')
 // })
 
 // Tests pour les companies (restaurants)
-
 describe("CompanyService", () => {
   require('./services/CompanyService.test')
 })
 
-// describe("CompanyController", () => {
-//   require('./controllers/CompanyController.test')
-// })
+describe("CompanyController", () => {
+  require('./controllers/CompanyController.test')
+})
 
 // Tests pour réservations
 

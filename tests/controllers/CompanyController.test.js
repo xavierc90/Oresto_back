@@ -49,7 +49,7 @@ let users = [
 it("Création des utilisateurs fictifs", (done) => {
     UserService.addManyUsers(users, null, function (err, value) {
         tab_id_users = _.map(value, '_id')
-        console.log(tab_id_users)
+        // console.log(tab_id_users)
         done()
     })
 })
@@ -263,7 +263,7 @@ describe("POST - /add_companies", () => {
 // Fonction pour la récupération des restaurants (avec champs)
 
 describe("GET - /companies_by_filters", () => {
-    it("Rechercher plusieurs restaurants avec filtres. - S", (done) => {
+    it("Rechercher plusieurs articles avec filtres. - S", (done) => {
         chai.request(server).get('/companies_by_filters').query({ page: 1, pageSize: 4})
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
@@ -278,7 +278,7 @@ describe("GET - /companies_by_filters", () => {
         .end((err, res) => {
             res.should.have.status(200)
             expect(res.body.results).to.be.an('array')
-            expect(res.body.count).to.be.equal(3)
+            expect(res.body.count).to.be.equal(4)
             done()
         })
     })
@@ -287,6 +287,178 @@ describe("GET - /companies_by_filters", () => {
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
             res.should.have.status(405)
+            done()
+        })
+    })
+})
+
+
+// A TERMINER POUR AUJOURDHUI 
+
+// Fonction pour la récupération des restaurants (avec champs)
+
+describe("GET - /find_companies", () => {
+    it("Rechercher plusieurs restaurants par ID. - S", (done) => {
+        chai.request(server).get('/find_companies').query({id: _.map(companies, '_id')})
+        .auth(token, { type: 'bearer' }) 
+        .end((err, res) => {
+            res.should.have.status(200);
+            done();
+        });
+    });
+
+    it("Rechercher plusieurs restaurants incorrects (avec un id inexistant). - E", (done) => {
+        chai.request(server).get('/find_companies').query({id: '665f18739d3e172be5daf092'})
+        .auth(token, { type: 'bearer' }) 
+        .end((err, res) => {
+            res.should.have.status(404);
+            done();
+        });
+    });
+
+    it("Rechercher plusieurs restaurants incorrects (avec un id invalide). - E", (done) => {
+        chai.request(server).get('/find_companies').query({id: '123,456'})
+        .auth(token, { type: 'bearer' }) 
+        .end((err, res) => {
+            res.should.have.status(405);
+            done();
+        });
+    });
+});
+
+describe("PUT - /update_company", () => {
+    it("Modifier un restaurant. - S", (done) => {
+        chai.request(server).put('/company/' + companies[0]._id)
+        .auth(token, { type: 'bearer' }) 
+        .send({name: 'Macbook Pro'})
+        .end((err, res) => {
+            res.should.have.status(200)
+            done()
+        })
+    })
+    it("Modifier un restaurant incorrect (avec un id inexistant). - E", (done) => {
+        chai.request(server).put('/update_company/665f18739d3e172be5daf092')
+        .auth(token, { type: 'bearer' }) 
+        .send({name: 'Imprimante HP'})
+        .end((err, res) => {
+            res.should.have.status(404)
+            done()
+        })
+    })
+    it("Modifier un restaurant incorrect (avec un id invalide). - E", (done) => {
+        chai.request(server).put('/company/123')
+        .auth(token, { type: 'bearer' }) 
+        .send({name: 'Macbook Pro', price: '2299'})
+        .end((err, res) => {
+            res.should.have.status(405)
+            done()
+        })
+    })
+    it("Modifier un restaurant avec un champ vide. - E", (done) => {
+        chai.request(server).put('/company/' + companies[0]._id)
+        .auth(token, { type: 'bearer' }) 
+        .send({name: '', address: 'Ordinateur portable'})
+        .end((err, res) => {
+            res.should.have.status(405)
+            done()
+        })
+    })    
+})
+
+describe("PUT - /update_companies", () => {
+    it("Modifier plusieurs articles. - S", (done) => {
+        chai.request(server).put('/companies').query({id: _.map(companies, '_id')})
+        .auth(token, { type: 'bearer' }) 
+        .send({name: 'Je change de nom de restaurant'})
+        .end((err, res) => {
+            res.should.have.status(200)
+            done()
+        })
+    })
+    it("Modifier plusieurs restaurants  incorrects (avec un id inexistant). - E", (done) => {
+        chai.request(server).put('/companies').query({id: ['667980900166578fd4b6b32b', '667980a00166578fd4b6b32c']})
+        .auth(token, { type: 'bearer' }) 
+        .send({name: 'restaurants avec ID inexistant'})
+        .end((err, res) => {
+            res.should.have.status(404)
+            done()
+        })
+    })
+    it("Modifier plusieurs restaurants incorrects (avec un id invalide). - E", (done) => {
+        chai.request(server).put('/companies').query({id: ['123', '456']})
+        .auth(token, { type: 'bearer' }) 
+        .send({name: 'restaurants avec ID invalide'})
+        .end((err, res) => {
+            res.should.have.status(405)
+            done()
+        })
+    })
+    it("Modifier plusieurs restaurants incorrects (sans renseigner l'id). - E", (done) => {
+        chai.request(server).put('/companies').query({id: []})
+        .auth(token, { type: 'bearer' }) 
+        .send({name: 'Coca-Cola'})
+        .end((err, res) => {
+            res.should.have.status(405)
+            done()
+        })
+    })
+    it("Modifier plusieurs restaurants avec un champ vide. - E", (done) => {
+        chai.request(server).put('/companies').query({id: _.map(articles, '_id')})
+        .auth(token, { type: 'bearer' }) 
+        .send({name: ''})
+        .end((err, res) => {
+            res.should.have.status(405)
+            done()
+        })
+    })
+})
+
+describe("DELETE - /delete_company", () => {
+    it("Supprimer un restaurant. - S", (done) => {
+        chai.request(server).delete('/company/' + companies[0]._id)
+        .auth(token, { type: 'bearer' }) 
+        .end((err, res) => {
+            res.should.have.status(200)
+            done()
+        })
+    })
+    it("Supprimer un restaurant incorrect (avec un id inexistant). - E", (done) => {
+        chai.request(server).delete('/company/665f18739d3e172be5daf092')
+        .auth(token, { type: 'bearer' }) 
+        .end((err, res) => {
+            res.should.have.status(404)
+            done()
+        })
+    })
+    it("Supprimer un restaurant incorrect (avec un id invalide). - E", (done) => {
+        chai.request(server).delete('/company/123')
+        .auth(token, { type: 'bearer' }) 
+        .end((err, res) => {
+            res.should.have.status(405)
+            done()
+        })
+    })
+})
+
+describe("DELETE - /companies", () => {
+    it("Supprimer plusieurs restaurants. - S", (done) => {
+        chai.request(server).delete('/companies').query({id: _.map(companies, '_id')})
+        .auth(token, { type: 'bearer' }) 
+        .end((err, res) => {
+            res.should.have.status(200)
+            done()
+        })
+    })
+    it("Supprimer plusieurs restaurants incorrects (avec un id invalide). - E", (done) => {
+        chai.request(server).delete('/companies').query({id: ['123', '456']})
+        .auth(token, { type: 'bearer' }) 
+        .end((err, res) => {
+            res.should.have.status(405)
+            done()
+        })
+    })
+    it("Supprimer les utilisateurs fictifs", (done) => {
+        UserService.deleteManyUsers(tab_id_users,null, function (err, value) {
             done()
         })
     })

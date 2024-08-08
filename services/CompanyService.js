@@ -185,7 +185,6 @@ module.exports.findOneCompanyById = function (company_id, options, callback) {
 }
 
 
-// Fonction pour rechercher plusieurs restaurants avec leur id 
 module.exports.findManyCompaniesById = function (companies_id, options, callback) {
     var opts = {populate: (options && options.populate ? ['user_id'] : []), lean: true}
     if (companies_id && Array.isArray(companies_id) && companies_id.length > 0 && companies_id.filter((e) => { return mongoose.isValidObjectId(e)}).length == companies_id.length) {
