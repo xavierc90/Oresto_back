@@ -10,7 +10,8 @@ var users = []
 var token = ""
 chai.use(chaiHttp)
 
-// TESTS CONTROLLER - Ajouter un utilisateur
+
+// TEST CONTROLLER - Ajouter un utilisateur (tous les roles)
 describe("POST - /register", () => {
     it("Ajouter un utilisateur . - S", (done) => {
         chai.request(server).post('/register').send({
@@ -62,6 +63,8 @@ describe("POST - /register", () => {
     })
 })
 
+
+// TEST CONTROLLER - Connecter un utilisateur (tous les roles)
 describe("POST - /login", () => {
     it("Connexion utilisateur - S", (done) => {
         // console.log(users)
@@ -94,6 +97,7 @@ describe("POST - /login", () => {
     })
 })
 
+
 // TESTS CONTROLLER - Ajouter un manager
 describe("POST - /register_manager", () => {
     it("Ajouter un manager . - S", (done) => {
@@ -125,10 +129,10 @@ describe("POST - /login_manager", () => {
     });
     it("Connecter un user sans role manager . - E", (done) => {
         chai.request(server).post('/login_manager').send({
-            email: "ttesteur@gmail.com",
+            email: "testeur@gmail.com",
             password: "azerty",
         }).end((err, res) => {
-            expect(res).to.have.status(401);
+            expect(res).to.have.status(403);
             done();   
         });
     })

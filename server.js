@@ -118,6 +118,15 @@ app.get('/find_company/:id', DatabaseMiddleware.checkConnection, passport.authen
 // Création du endpoint /companies_by_filters pour la recherche de restaurants avex filtres
 app.get('/companies_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.findManyCompanies);
 
+// Création du endpoint /update_company/:id pour la recherche de restaurants avex filtres
+app.get('/update_company/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.updateOneCompany);
+
+// Création du endpoint /delete_company/:id pour la recherche de restaurants avex filtres
+app.get('/delete_company/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.deleteOneCompany);
+
+// Création du endpoint /update_company/:id pour la recherche de restaurants avex filtres
+app.get('/delete_companies/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), CompanyController.deleteManyCompanies);
+
 /*--------------------- Création des routes (Table - Tables restaurant) ---------------------*/
 
 app.post('/add_table/', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), TableController.addOneTable);

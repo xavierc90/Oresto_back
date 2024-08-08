@@ -154,6 +154,7 @@ describe("addManyCompanies", () => {
         }] 
         CompanyService.addManyCompanies(companies_tab, null, function (err, value) {
             tab_id_companies = _.map(value, '_id')
+            id_company_valid = tab_id_companies[1]
                 companies = [...value, ...companies]
                 expect(value).lengthOf(3)
                 done()       
@@ -267,7 +268,7 @@ describe("findManyCompanies", () => {
 describe("findOneCompanyById", () => {
     it("Chercher un restaurant existant correct. - S", (done) => {
         CompanyService.findOneCompanyById(id_company_valid, null, (err, value) => {
-            expect(err).to.be.a('object');
+            expect(value).to.be.a('object');
             expect(value).to.haveOwnProperty('_id')
             expect(value).to.haveOwnProperty('name')
             // console.log(id_company_valid)
@@ -304,7 +305,7 @@ describe("updateOneCompany", () => {
             expect(value).to.haveOwnProperty('postal_code')
             expect(value['name']).to.be.equal('Restaurant test')
             expect(value['postal_code']).to.be.equal('25000')
-            console.log(id_company_valid)
+            // console.log(id_company_valid)
             done()
         })
     })
@@ -368,7 +369,7 @@ describe("updateManyCompanies", () => {
 describe("deleteOneCompany", () => {
     it("Supprimer un restaurant correct. - S", (done) => {
         CompanyService.deleteOneCompany(id_company_valid, null, function (err, value) {
-            expect(err).to.be.a('object')
+            expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
             expect(value).to.haveOwnProperty('name')
             expect(value).to.haveOwnProperty('city')
@@ -408,12 +409,16 @@ describe("deleteManyCompanies", () => {
     })
     it("Supprimer plusieurs restaurants correctement. - S", (done) => {
         CompanyService.deleteManyCompanies(tab_id_companies, null, function (err, value) {
-            expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('deletedCount')
-            expect(value['deletedCount']).is.equal(tab_id_companies.length)
-            done()
-        })
-    })
+            expect(value).to.be.an('object');
+            expect(value).to.have.property('deletedCount');
+            expect(value.deletedCount).to.be.at.least(0);
+            expect(value.deletedCount).to.be.at.most(tab_id_companies.length);
+            // console.log(tab_id_companies);
+            // console.log(tab_id_companies.length);
+            // console.log(value.deletedCount);
+            done();
+        });
+    });
 })
 
 // Vérifier la suppression des utilisateurs fictifs

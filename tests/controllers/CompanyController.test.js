@@ -5,6 +5,7 @@ const expect = chai.expect
 const server = require('../../server')
 const should = chai.should()
 const _ = require('lodash')
+const Table = require('../../schemas/Table')
 let token = ""
 var company = []
 var companies = []
@@ -16,6 +17,7 @@ let users = [
         lastname: "Réservation",
         email:"client5@gmail.com",
         phone_number: "+33601020304",
+        role: "manager",
         password: "azerty"
     },    
     {
@@ -23,6 +25,7 @@ let users = [
         lastname: "Réservation",
         email:"client6@gmail.com",
         phone_number: "+33601020304",
+        role: "manager",
         password: "azerty"
     },    
     {
@@ -30,6 +33,7 @@ let users = [
         lastname: "Réservation",
         email:"client7@gmail.com",
         phone_number: "+33601020304",
+        role: "manager",
         password: "azerty"
     },
     {
@@ -37,6 +41,7 @@ let users = [
         lastname: "Client",
         email:"client8@gmail.com",
         phone_number: "+33601020304",
+        role: "manager",
         password: "azerty"
     }
 ]
@@ -44,7 +49,7 @@ let users = [
 it("Création des utilisateurs fictifs", (done) => {
     UserService.addManyUsers(users, null, function (err, value) {
         tab_id_users = _.map(value, '_id')
-        // console.log(err)
+        console.log(tab_id_users)
         done()
     })
 })
@@ -87,6 +92,7 @@ describe("POST - /add_company", () => {
         .end((err, res) => {
             expect(res).to.have.status(201)
             company.push(res.body)
+            // console.log(res.body)
             done()
         });
     }),
@@ -257,7 +263,7 @@ describe("POST - /add_companies", () => {
 // Fonction pour la récupération des restaurants (avec champs)
 
 describe("GET - /companies_by_filters", () => {
-    it("Rechercher plusieurs articles avec filtres. - S", (done) => {
+    it("Rechercher plusieurs restaurants avec filtres. - S", (done) => {
         chai.request(server).get('/companies_by_filters').query({ page: 1, pageSize: 4})
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
@@ -266,22 +272,16 @@ describe("GET - /companies_by_filters", () => {
             done()
         })
     })
-})
-
-describe("GET - /companies_by_filters", () => {
-    it("Rechercher plusieurs articles avec query vide. - S", (done) => {
+    it("Rechercher plusieurs restaurants avec query vide. - S", (done) => {
         chai.request(server).get('/companies_by_filters').query({ page: 1, pageSize: 4})
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
             res.should.have.status(200)
             expect(res.body.results).to.be.an('array')
-            expect(res.body.count).to.be.equal(4)
+            expect(res.body.count).to.be.equal(3)
             done()
         })
     })
-})
-
-describe("GET - /companies_by_filters", () => {
     it("Rechercher plusieurs restaurants avec une chaîne de caractère dans page - E", (done) => {
         chai.request(server).get('/companies_by_filters').query({ page: 'salut les gens', pageSize: 2})
         .auth(token, { type: 'bearer' }) 

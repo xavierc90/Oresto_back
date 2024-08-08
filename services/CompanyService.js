@@ -325,7 +325,7 @@ module.exports.deleteOneCompany = function (company_id, options, callback) {
                 if (value)
                     callback(null, value.toObject())
                 else
-                callback({ msg: "Restaurant non trouvé.", type_error: "no-found" });
+                callback({ msg: "restaurant non trouvé.", type_error: "no-found" });
             }
             catch (e) {
                 
@@ -341,7 +341,6 @@ module.exports.deleteOneCompany = function (company_id, options, callback) {
 }
 
 // Fonction pour supprimer plusieurs restaurants
-
 module.exports.deleteManyCompanies = function(companies_id, options, callback) {
     if (companies_id && Array.isArray(companies_id) && companies_id.length > 0 && companies_id.filter((e) => { return mongoose.isValidObjectId(e)}).length == companies_id.length) {
         companies_id = companies_id.map((e) => {return new ObjectId(e)})

@@ -6,7 +6,7 @@ let id_user_valid = ""
 var tab_id_users = []
 var users = []
 
-// TEST - Service pour ajouter un utilisteur
+// TEST - Service pour ajouter un utilisteur (tous les roles)
 describe("addOneUser", () => {
     it("Utilisateur correct. - S", (done) => {
         var user = {
@@ -62,8 +62,7 @@ describe("addOneUser", () => {
     })
 })
 
-// Service pour ajouter plusieurs utilisteurs
-
+// TEST - Service pour ajouter plusieurs utilisateurs (tous les roles)
 describe("addManyUsers", () => {
     it("Utilisateurs à ajouter, non valide. - E", (done) => {
         var users_tab_error = [{
@@ -115,8 +114,7 @@ describe("addManyUsers", () => {
     })
 })
 
-
-
+// TEST - Service pour rechercher un utilisteur (tous les roles)
 describe("findOneUser", () => {
     it("Chercher un utilisateur par les champs selectionnées. - S", (done) => {
         UserService.findOneUser(["email"], users[0].email, null, function (err, value) {
@@ -145,6 +143,7 @@ describe("findOneUser", () => {
     })
 })
 
+// TEST - Service pour rechercher un utilisteur avec son id (tous les roles)
 describe("findOneUserById", () => {
     it("Chercher un utilisateur existant correct. - S", (done) => {
         UserService.findOneUserById(id_user_valid, null, function (err, value) {
@@ -152,7 +151,6 @@ describe("findOneUserById", () => {
             expect(value).to.haveOwnProperty('_id')
             expect(value).to.haveOwnProperty('email')
             done()
-
         })
     })
     it("Chercher un utilisateur non-existant correct. - E", (done) => {
@@ -164,10 +162,9 @@ describe("findOneUserById", () => {
         })
     })
 })
-
 describe("findManyUsers", () => {
     it("Retourne 4 utilisateurs - S", (done) => {
-        UserService.findManyUsers(null, 3, 1, null, function (err, value) {
+        UserService.findManyUsers(null, 3, 1, function (err, value) {
             expect(value).to.haveOwnProperty("count")
             expect(value).to.haveOwnProperty("results")
             expect(value["count"]).to.be.equal(4)
@@ -177,7 +174,7 @@ describe("findManyUsers", () => {
         })
     })
     it("Envoie d'une chaine de caractère a la place de la page - E", (done) => {
-        UserService.findManyUsers(null, "coucou", 3, null, function (err, value) {
+        UserService.findManyUsers(null, "coucou", 3, function (err, value) {
             expect(err).to.haveOwnProperty("type_error")
             expect(err["type_error"]).to.be.equal("no-valid")
             expect(value).to.undefined
@@ -186,7 +183,7 @@ describe("findManyUsers", () => {
     })
 })
 
-
+// TEST - Service pour rechercher pusieurs utilisteurs avec le userId (tous les roles)
 describe("findManyUsersById", () => {
     it("Chercher des utilisateurs existant correct. - S", (done) => {
         UserService.findManyUsersById(tab_id_users, null, function (err, value) {
@@ -197,6 +194,7 @@ describe("findManyUsersById", () => {
     })
 })
 
+// TEST - Service pour modifier un utilisateur (tous les roles)
 describe("updateOneUser", () => {
     it("Modifier un utilisateur correct. - S", (done) => {
         UserService.updateOneUser(id_user_valid, { email: "dragon3000", firstname: "cracheurdefeu" }, null, function (err, value) {
@@ -231,6 +229,7 @@ describe("updateOneUser", () => {
     })
 })
 
+// TEST - Service pour supprimer un utilisateur (tous les roles)
 describe("deleteOneUser", () => {
     it("Supprimer un utilisateur correct. - S", (done) => {
         UserService.deleteOneUser(id_user_valid, null, function (err, value) { 
@@ -262,6 +261,7 @@ describe("deleteOneUser", () => {
     })
 })
 
+// TEST - Service pour supprimer plusieurs utilisateurs (tous les roles)
 describe("deleteManyUsers", () => {
     it("Supprimer plusieurs utilisateurs correctement. - S", (done) => {
         UserService.deleteManyUsers(tab_id_users, null, function (err, value) {

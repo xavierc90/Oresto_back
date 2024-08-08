@@ -45,7 +45,6 @@ module.exports.loginManager = function(req, res, next) {
   });
 };
 
-
 /**
  * @swagger
  * /register:
