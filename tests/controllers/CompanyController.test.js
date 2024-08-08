@@ -16,28 +16,32 @@ let users = [
         lastname: "Réservation",
         email:"client5@gmail.com",
         phone_number: "+33601020304",
-        password: "azerty"
+        password: "azerty",
+        role: "manager"
     },    
     {
         firstname: "Client 6",
         lastname: "Réservation",
         email:"client6@gmail.com",
         phone_number: "+33601020304",
-        password: "azerty"
+        password: "azerty",
+        role: "manager"
     },    
     {
         firstname: "Client 7",
         lastname: "Réservation",
         email:"client7@gmail.com",
         phone_number: "+33601020304",
-        password: "azerty"
+        password: "azerty",
+        role: "manager"
     },
     {
         firstname: "Client 8",
         lastname: "Client",
         email:"client8@gmail.com",
         phone_number: "+33601020304",
-        password: "azerty"
+        password: "azerty",
+        role: "manager"
     }
 ]
 
@@ -54,6 +58,7 @@ function rdm_user (tab) {
     return rdm_id
 }
 
+// Connecter un manager
 describe("POST - /login", () => {
     it("Connexion utilisateur - S", (done) => {
         chai.request(server).post('/login').send({
@@ -69,8 +74,8 @@ describe("POST - /login", () => {
 
 chai.use(chaiHttp)
 
-// Tests de la fonction pour l'ajout d'un restaurant
 
+// Tests de la fonction pour l'ajout d'un restaurant
 describe("POST - /add_company", () => {
     it("Ajouter un restaurant - S", (done) => {
         chai.request(server).post('/add_company').send({

@@ -171,7 +171,8 @@ module.exports.findOneUser = function (tab_field, value, options, callback) {
 // La fonction permet de rechercher tous les utilisateurs 
 module.exports.findManyUsers = function(search, page, limit, callback) {
     page = !page ? 1 : parseInt(page);
-    limit = !limit ? 10 : parseInt(limit);
+    limit = !limit ? 10 : parseInt(limit)
+    // console.log(page, limit)
     
     if (isNaN(page) || isNaN(limit)) {
         callback({ msg: `Format de ${isNaN(page) ? 'page' : 'limit'} invalide.`, type_error: 'no-valid' });
