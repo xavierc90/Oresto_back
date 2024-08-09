@@ -1,37 +1,35 @@
+
 const BookingSchema = require('../schemas/Booking')
+const Table = require('../schemas/Table')
 const _ = require('lodash')
 const async = require('async')
 const mongoose = require('mongoose')
 
-const Booking = mongoose.model('Booking', BookingSchema)
+const Booking = mongoose.models.Booking || mongoose.model('Booking', BookingSchema);
 
-module.exports.addOneBooking = async function (bookingData, options, callback) {
+// Ajouter une réservation
+module.exports.addOneBooking = async function (bookingData, callback) {
     try {
-        if (options && options.user) {
-            bookingData.user_id = options.user._id;
-        }
         const newBooking = new Booking(bookingData);
-        const errors = newBooking.validateSync();
-        if (errors) {
-            // Rassembler les messages d'erreur
-            const text = Object.keys(errors.errors).map((key) => {
-                return errors.errors[key].message;
-            }).join(' ');
 
-            const fieldsWithError = _.transform(Object.keys(errors.errors), (result, key) => {
-                result[key] = errors.errors[key].message;
-            }, {});
-            const err = {
-                msg: text,
-                fields_with_error: Object.keys(errors.errors),
-                fields: fieldsWithError,
-                type_error: 'validator'
-            };
-            return callback(err);
+        const validationError = newBooking.validateSync();
+        if (validationError) {
+            console.log("Validation Error:", validationError);  // Ajoutez des logs ici pour voir les détails en console
+            return callback({
+                message: "Validation failed",
+                errors: validationError.errors,
+                type_error: "validation_error"
+            });
         }
+
         await newBooking.save();
-        callback(null, newBooking.toObject());
+        callback(null, newBooking);
     } catch (error) {
-        callback(error);
+        console.error("Error in addOneBooking:", error);  // Log any unexpected errors.
+        callback({
+            message: "Error creating booking",
+            type_error: "unknown_error",
+            error: error.message || String(error)  // Assurez-vous de convertir l'erreur en string si nécessaire
+        });
     }
-}
+};

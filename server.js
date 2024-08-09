@@ -51,6 +51,7 @@ app.use(passport.session());
 const UserController = require('./controllers/UserController');
 const CompanyController = require('./controllers/CompanyController');
 const TableController = require('./controllers/TableController');
+const bookingController = require('./controllers/BookingController');
 
 const DatabaseMiddleware = require('./middlewares/database');
 const LoggerMiddleware = require('./middlewares/logger');
@@ -68,7 +69,7 @@ app.post('/login_manager', DatabaseMiddleware.checkConnection, UserController.lo
 /*--------------------- Création des routes (User - Utilisateur) ---------------------*/
 
 // Création du endpoint /register pour l'ajout d'un utilisateur
-app.post('/register', DatabaseMiddleware.checkConnection, UserController.addOneUser);
+app.post('/register', DatabaseMiddleware.checkConnection, UserController.addOneUser)
 
 // Création du endpoint /login pour connecter un utilisateur
 app.post('/login', DatabaseMiddleware.checkConnection, UserController.loginUser);
@@ -140,7 +141,14 @@ app.get('/find_table/:id', DatabaseMiddleware.checkConnection, passport.authenti
 // Création du endpoint /tables_by_filters pour la recherche de restaurants avex filtres
 app.get('/tables_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), TableController.findManyTables);
 
+/*--------------------- Création des routes (Manager - Restaurateur) ---------------------*/
+
+// Création du endpoint /add_booking pour ajouter une réservation
+
 /*--------------------- FIN DES ROUTES ---------------------*/
+
+app.post('/add_booking', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), bookingController.addOneBooking);
+
 
 app.listen(Config.port, () => {
   Logger.info(`Serveur démarré sur le port ${Config.port}`);

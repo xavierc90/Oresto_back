@@ -3,12 +3,12 @@ const UserService = require('./UserService')
 const mongoose = require('mongoose')
 
 // Fonction pour ajouter une table
-module.exports.addOneTable = async function (tableData, options, callback) {
+module.exports.addOneTable = async function (table, options, callback) {
     try {
-        if (!tableData.user_id) {
+        if (!table.user_id) {
             return callback({ msg: "user_id est requis.", type_error: "missing-field" });
         }  
-        UserService.findOneUserById(tableData.user_id, options, async function (err, user) {
+        UserService.findOneUserById(table.user_id, options, async function (err, user) {
             if (err) {
                 return callback(err);
             }
@@ -17,7 +17,7 @@ module.exports.addOneTable = async function (tableData, options, callback) {
                 return callback({ msg: "Aucune société trouvée pour cet utilisateur.", type_error: "no-company" });
             }
             const newTable = new Table({
-                ...tableData,
+                ...table,
                 company_id: company._id,
                 created_by: user._id
             });

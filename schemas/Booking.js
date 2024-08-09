@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
-var BookingSchema = new mongoose.Schema({
+const BookingSchema = new mongoose.Schema({
     company_id: {
         type: ObjectId,
         ref: 'Company',
-        required: true
+        required: false
     },
     table_id: {
         type: ObjectId,
         ref: 'Table',
         required: true
     },
-    user_id: {
+    user_id: { 
         type: ObjectId,
         ref: 'User',
         required: true
@@ -34,8 +34,13 @@ var BookingSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['waiting', 'confirmed', 'canceled', 'archived'],
-        default: 'waiting'
+        enum: [
+            "waiting",
+            "confirmed",
+            "canceled",
+            "archived"
+        ],
+        default: "waiting"
     },
     created_at: {
       type: Date,
@@ -43,16 +48,10 @@ var BookingSchema = new mongoose.Schema({
     }
 });
 
-// Virtual for user details
-BookingSchema.virtual('userInfo', {
-    ref: 'User', // The model to use
-    localField: 'user_id', // The field on the Booking model
-    foreignField: '_id', // The field on the User model
-    justOne: true // Returns just one user (not an array)
-});
+BookingSchema.index({ company_id: 1, table_id: 1, date_selected: 1, time_selected: 1 }, { unique: true });
 
 // To include virtuals in output
 BookingSchema.set('toJSON', { virtuals: true });
 BookingSchema.set('toObject', { virtuals: true });
 
-module.exports = mongoose.model('Booking', BookingSchema);
+module.exports = BookingSchema;  // Export the schema, NOT the model

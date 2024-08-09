@@ -122,6 +122,8 @@ module.exports.addOneUser = function (req, res) {
  *       405:
  *          $ref: '#/components/responses/ValidationError'
  */
+
+
 // La fonction permet d'ajouter plusieurs utilisateurs
 module.exports.addManyUsers = function (req, res) {
   req.log.info("Création de plusieurs utilisateurs");
