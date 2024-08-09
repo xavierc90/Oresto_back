@@ -1,56 +1,41 @@
 const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId
+const ObjectId = mongoose.Types.ObjectId;
 
-
-const TableSchema = mongoose.Schema({
+const TableSchema = new mongoose.Schema({
   company_id: {
     type: ObjectId,
     ref: 'Company',
-    required: true
-},
+    required: false
+  },
   table_number: {
     type: Number,
-    required: true,
-    default: 1,
-    min: 1
+    required: true
   },
   table_size: {
     type: Number,
     required: true,
     default: 2,
-    min: 1
-  },
-  status: {
-    type: String,
-    required: true,
-    enum: [
-      "available",
-      "reserved",
-      "unavailable"
-    ],
-    default: "available"
-  },
-  index: {
-    type: Number,
-    required: false
-  },
-  position_x: {
-    type: Number,
-    required: false
-  },
-  position_y: {
-    type: Number,
-    required: false
+    min: 2
   },
   shape: {
     type: String,
     required: true,
-    enum: [
-      "rectangle",
-      "square",
-      "round"
-    ],
+    enum: ["rectangle", "square", "round"],
     default: "round"
+  },
+  status: {
+    type: String,
+    enum: ["available", "reserved", "unavailable"],
+    default: "available"
+  },
+  index: {
+    type: Number
+  },
+  position_x: {
+    type: Number
+  },
+  position_y: {
+    type: Number
   },
   created_at: {
     type: Date,
@@ -62,7 +47,10 @@ const TableSchema = mongoose.Schema({
   }
 });
 
-TableSchema.index({ table_number: 1 });
-TableSchema.index({ position_x: 1, position_y: 1 });
+// Middleware to update `updated_at` before saving
+TableSchema.pre('save', function (next) {
+  this.updated_at = Date.now();
+  next();
+});
 
 module.exports = mongoose.model('Table', TableSchema);

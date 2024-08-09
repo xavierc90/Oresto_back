@@ -103,7 +103,6 @@ app.delete('/delete_users', DatabaseMiddleware.checkConnection, passport.authent
 // Création du endpoint /logout pour la déconnexion d'un utilisateur
 app.post('/logout', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', {session : false }), UserController.logoutUser);
 
-
 /*--------------------- Création des routes (Company - Restaurants) ---------------------*/
 
 // Création du endpoint /add_company pour l'ajout d'un restaurant
@@ -132,7 +131,9 @@ app.get('/delete_companies/:id', DatabaseMiddleware.checkConnection, passport.au
 
 /*--------------------- Création des routes (Table - Tables restaurant) ---------------------*/
 
-app.post('/add_table/', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), TableController.addOneTable);
+app.post('/add_table', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), TableController.addOneTable);
+
+/*--------------------- FIN DES ROUTES ---------------------*/
 
 app.listen(Config.port, () => {
   Logger.info(`Serveur démarré sur le port ${Config.port}`);

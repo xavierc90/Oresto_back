@@ -299,10 +299,12 @@ describe("GET - /companies_by_filters", () => {
 
 describe("GET - /find_companies", () => {
     it("Rechercher plusieurs restaurants par ID. - S", (done) => {
-        chai.request(server).get('/find_companies').query({id: _.map(companies, '_id')})
+        chai.request(server).get('/find_companies/').query({id: _.map(companies, '_id')})
         .auth(token, { type: 'bearer' }) 
         .end((err, res) => {
             res.should.have.status(200);
+            expect(res.body).to.be.an('array');
+            // console.log(companies)
             done();
         });
     });
