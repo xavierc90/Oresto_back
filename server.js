@@ -131,7 +131,14 @@ app.get('/delete_companies/:id', DatabaseMiddleware.checkConnection, passport.au
 
 /*--------------------- Création des routes (Table - Tables restaurant) ---------------------*/
 
+// Création du endpoint /add_table pour créer une table
 app.post('/add_table', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), TableController.addOneTable);
+
+// Création du endpoint /find_table/:id pour la recherche d'une table avec son id
+app.get('/find_table/:id', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), TableController.findOneTableById);
+
+// Création du endpoint /tables_by_filters pour la recherche de restaurants avex filtres
+app.get('/tables_by_filters', DatabaseMiddleware.checkConnection, passport.authenticate('jwt', { session: false }), TableController.findManyTables);
 
 /*--------------------- FIN DES ROUTES ---------------------*/
 

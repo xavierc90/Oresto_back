@@ -5,14 +5,14 @@ const TableSchema = new mongoose.Schema({
   company_id: {
     type: ObjectId,
     ref: 'Company',
-    required: false
+    required: true
   },
   created_by: {
-    type: String,
+    type: String, // Garder comme String pour stocker user_id en chaîne
     required: true
   },
   table_number: {
-    type: Number,
+    type: String, // Modifier pour accepter des valeurs alphanumériques
     required: true
   },
   table_size: {
