@@ -7,6 +7,10 @@ const TableSchema = new mongoose.Schema({
     ref: 'Company',
     required: false
   },
+  created_by: {
+    type: String,
+    required: true
+  },
   table_number: {
     type: Number,
     required: true
